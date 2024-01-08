@@ -1,0 +1,14 @@
+streamlit
+numpy
+pandas
+matplotlib
+scikit-learn
+nltk
+google-play-scraper
+pillow
+wordcloud
+sastrawi
+regex
+svm
+openpyxl
+plotly
