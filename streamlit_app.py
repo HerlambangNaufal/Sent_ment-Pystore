@@ -378,7 +378,7 @@ def main():
 
                     def score_sentiment(score):
                         if score == 'positive':
-                            return 0
+                            return 1
                         elif score == 'negative':
                             return -1
                         else:
