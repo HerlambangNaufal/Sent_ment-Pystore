@@ -189,7 +189,11 @@ def main():
                     df = df.reset_index(drop=True)
                     st.write("Finish Pre-processing")
                     st.write("===========================================================")
-
+                    
+                    # Determine sentiment polarity of doc using indonesia sentiment lexicon
+                    st.write("Count Polarity and Labeling...")
+                    st.caption("using indonesia sentiment lexicon")
+                    import csv
                     # Function to read lexicon from TSV file
                     def read_lexicon(file_path, sentiment_value):
                         lexicon = {}
