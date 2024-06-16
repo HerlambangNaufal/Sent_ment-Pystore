@@ -206,32 +206,32 @@ def main():
                         return lexicon
                 
                     # Read positive and negative lexicons
-                        positive_lexicon = read_lexicon(positive_lexicon_path, 1)
-                        negative_lexicon = read_lexicon(negative_lexicon_path, -1)
+                    positive_lexicon = read_lexicon(positive_lexicon_path, 1)
+                    negative_lexicon = read_lexicon(negative_lexicon_path, -1)
                         
-                        # Combine lexicons
-                        lexicon = {**positive_lexicon, **negative_lexicon}
+                    # Combine lexicons
+                    lexicon = {**positive_lexicon, **negative_lexicon}
                         
-                        # Display lexicon for debugging
-                        st.write("Positive Lexicon:", positive_lexicon)
-                        st.write("Negative Lexicon:", negative_lexicon)
+                    # Display lexicon for debugging
+                    st.write("Positive Lexicon:", positive_lexicon)
+                    st.write("Negative Lexicon:", negative_lexicon)
                         
-                        # Function to determine sentiment polarity of text
-                        def sentiment_analysis_lexicon_indonesia(words):
-                            score = 0
-                            try:
-                                for word in words:  # `words` is a list of words
-                                    if word in lexicon:
-                                        score += lexicon[word]
-                            except Exception as e:
-                                st.write(f"Error in sentiment analysis: {e}")
+                    # Function to determine sentiment polarity of text
+                    def sentiment_analysis_lexicon_indonesia(words):
+                        score = 0
+                        try:
+                            for word in words:  # `words` is a list of words
+                                if word in lexicon:
+                                    score += lexicon[word]
+                        except Exception as e:
+                            st.write(f"Error in sentiment analysis: {e}")
                         
-                            polarity = 'neutral'
-                            if score > 0:
-                                polarity = 'positive'
-                            elif score < 0:
-                                polarity = 'negative'    
-                            return score, polarity
+                        polarity = 'neutral'
+                        if score > 0:
+                            polarity = 'positive'
+                        elif score < 0:
+                            polarity = 'negative'    
+                        return score, polarity    
                     # Apply sentiment analysis
                     results = df['text_stopword'].apply(sentiment_analysis_lexicon_indonesia)
                     results = list(zip(*results))
