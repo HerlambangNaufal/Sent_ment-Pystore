@@ -190,41 +190,45 @@ def main():
                     st.write("Finish Pre-processing")
                     st.write("===========================================================")
 
-                    # Determine sentiment polarity of doc using indonesia sentiment lexicon
-                    st.write("Count Polarity and Labeling...")
-                    st.caption("using indonesia sentiment lexicon")
-                    lexicon = dict()
-                    import csv
-                    with open('modified3_full_lexicon.csv', 'r') as csvfile:
-                        reader = csv.reader(csvfile, delimiter=',')
-                        for row in reader:
-                            lexicon[row[0]] = int(row[1])
-
-                    # Function to determine sentiment polarity of tweets
+                    # Function to read lexicon from TSV file
+                    def read_lexicon(file_path, sentiment_value):
+                        lexicon = {}
+                        with open(file_path, 'r') as tsvfile:
+                            reader = csv.reader(tsvfile, delimiter='\t')
+                            for row in reader:
+                                lexicon[row[0]] = sentiment_value
+                        return lexicon
+                    
+                    # Read positive and negative lexicons
+                    positive_lexicon = read_lexicon('positive.tsv', 1)
+                    negative_lexicon = read_lexicon('negative.tsv', -1)
+                    
+                    # Combine lexicons
+                    lexicon = {**positive_lexicon, **negative_lexicon}
+                    
+                    # Function to determine sentiment polarity of text
                     def sentiment_analysis_lexicon_indonesia(text):
-                        #for word in text:
                         score = 0
-                        for word in text:
-                            if (word in lexicon):
-                                score = score + lexicon[word]
-
-                        polarity=''
-                        if (score > 0):
+                        for word in text.split():  # Assuming `text` is a string of words
+                            if word in lexicon:
+                                score += lexicon[word]
+                    
+                        polarity = 'neutral'
+                        if score > 0:
                             polarity = 'positive'
-                        elif (score < 0):
+                        elif score < 0:
                             polarity = 'negative'
-                        else:
-                            polarity = 'neutral'
                         return score, polarity
-
+                        
+                    # Display results with Streamlit
                     results = df['text_stopword'].apply(sentiment_analysis_lexicon_indonesia)
                     results = list(zip(*results))
                     df['score'] = results[0]
                     df['sentiment'] = results[1]
+                    
                     st.text(df['sentiment'].value_counts())
-
                     st.dataframe(df)
-                    st.download_button(label='Download CSV', data = df.to_csv(index=False, encoding='utf8'), file_name='Labeled_'+url+'.csv',on_click=callback)
+                    st.download_button(label='Download CSV', data=df.to_csv(index=False, encoding='utf8'), file_name='Labeled_'+url+'.csv',on_click=callback')
 
         except:
             st.write('Select The Correct File')
