@@ -257,7 +257,7 @@ def main():
                                     st.dataframe(df)
                                     st.download_button(label='Download CSV', data=df.to_csv(index=False, encoding='utf8'), file_name='Labeled_data.csv')
                     
-                        except Exception as e:
+        except Exception as e:
                             st.write('An error occurred: {}'.format(e))
 
     with tab3:
