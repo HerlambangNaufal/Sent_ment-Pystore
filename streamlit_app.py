@@ -196,7 +196,7 @@ def main():
                     st.caption("using indonesia sentiment lexicon")
                     lexicon = dict()
                     import csv
-                    with open('InSet_Lexicon', 'r') as csvfile:
+                    with open('InSet_Lexicon.csv', 'r') as csvfile:
                         reader = csv.reader(csvfile, delimiter=',')
                         for row in reader:
                             lexicon[row[0]] = int(row[1])
