@@ -194,46 +194,44 @@ def main():
                     st.write("Count Polarity and Labeling...")
                     st.caption("using indonesia sentiment lexicon")
                     import csv
-                    # Define the paths to the lexicon files
-                    positive_lexicon_path = 'positive.tsv'
-                    negative_lexicon_path = 'negative.tsv'
-                    normalization_file_path = 'normal.xlsx'
-                    
-                    # Function to read lexicon from TSV file
-                    def read_lexicon(file_path, sentiment_value):
-                        lexicon = {}
-                        try:
-                            with open(file_path, 'r', encoding='utf-8') as tsvfile:
-                                reader = csv.reader(tsvfile, delimiter='\t')
-                                for row in reader:
-                                    lexicon[row[0]] = sentiment_value
-                        except Exception as e:
-                            st.write(f"Error reading {file_path}: {e}")
-                        return lexicon
-                    
-                    # Read positive and negative lexicons
-                    positive_lexicon = read_lexicon(positive_lexicon_path, 1)
-                    negative_lexicon = read_lexicon(negative_lexicon_path, -1)
-                    
-                    # Combine lexicons
-                    lexicon = {**positive_lexicon, **negative_lexicon}
-
-                    # Function to determine sentiment polarity of text
-                    def sentiment_analysis_lexicon_indonesia(text):
-                        score = 0
-                        try:
-                            for word in text.split():  # Assuming `text` is a string of words
-                                if word in lexicon:
-                                    score += lexicon[word]
-                        except Exception as e:
-                            st.write(f"Error in sentiment analysis: {e}")
-                    
-                        polarity = 'neutral'
-                        if score > 0:
-                            polarity = 'positive'
-                        elif score < 0:
-                            polarity = 'negative'
-                        return score, polarity
+                   def read_lexicon(file_path, sentiment_value):
+                    lexicon = {}
+                    try:
+                        with open(file_path, 'r', encoding='utf-8') as tsvfile:
+                            reader = csv.reader(tsvfile, delimiter='\t')
+                            for row in reader:
+                                lexicon[row[0]] = sentiment_value
+                    except Exception as e:
+                        st.write(f"Error reading {file_path}: {e}")
+                    return lexicon
+                
+                # Read positive and negative lexicons
+                positive_lexicon = read_lexicon(positive_lexicon_path, 1)
+                negative_lexicon = read_lexicon(negative_lexicon_path, -1)
+                
+                # Combine lexicons
+                lexicon = {**positive_lexicon, **negative_lexicon}
+                
+                # Display lexicon for debugging
+                st.write("Positive Lexicon:", positive_lexicon)
+                st.write("Negative Lexicon:", negative_lexicon)
+                
+                # Function to determine sentiment polarity of text
+                def sentiment_analysis_lexicon_indonesia(words):
+                    score = 0
+                    try:
+                        for word in words:  # `words` is a list of words
+                            if word in lexicon:
+                                score += lexicon[word]
+                    except Exception as e:
+                        st.write(f"Error in sentiment analysis: {e}")
+                
+                    polarity = 'neutral'
+                    if score > 0:
+                        polarity = 'positive'
+                    elif score < 0:
+                        polarity = 'negative'
+                    return score, polarity
                     # Apply sentiment analysis
                     results = df['text_stopword'].apply(sentiment_analysis_lexicon_indonesia)
                     results = list(zip(*results))
