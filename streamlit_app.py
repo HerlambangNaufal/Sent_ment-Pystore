@@ -228,7 +228,7 @@ def main():
                     
                     st.text(df['sentiment'].value_counts())
                     st.dataframe(df)
-                    st.download_button(label='Download CSV', data=df.to_csv(index=False, encoding='utf8'), file_name='Labeled_'+url+'.csv',on_click=callback')
+                    st.download_button(label='Download CSV', data=df.to_csv(index=False, encoding='utf8'), file_name='Labeled_data.csv')
 
         except:
             st.write('Select The Correct File')
