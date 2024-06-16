@@ -100,151 +100,165 @@ def main():
                 if proses or st.session_state.prosess:
                     st.session_state.prosess = True
 
-                    # Cleaning Text
                     def cleansing(text):
-                        #removing number
-                        text = re.sub(r"\d+","", text)
-                        # remove non ASCII (emoticon, chinese word, .etc)
-                        text = text.encode('ascii', 'replace').decode('ascii')
-                        # remove mention, link, hashtag
-                        text = ' '.join(re.sub("([@#][A-Za-z0-9]+)|(\w+:\/\/\S+)"," ", text).split())
-                        #Alphabeth only, exclude number and special character
-                        text = re.sub(r'[^a-zA-Z]', ' ', text)
-                        text = re.sub(r'\b[a-zA-Z]\b', ' ', text)
-                        # replace word repetition with a single occutance ('oooooooo' to 'o')
-                        text = re.sub(r'(.)\1+', r'\1\1', text)
-                        # replace punctations repetitions with a single occurance ('!!!!!!!' to '!')
-                        text = re.sub(r'[\?\.\!]+(?=[\?.\!])', '', text)
-                        #remove multiple whitespace into single whitespace
-                        text = re.sub('\s+',' ',text)
-                        #remove punctuation
-                        text = text.translate(text.maketrans("","",string.punctuation))
-                        # Remove double word
-                        text = text.strip()
-                        #text = ' '.join(dict.fromkeys(text.split()))
-                        return text
-
-                    # Case folding text
-                    def casefolding(text):
-                        text = text.lower()
-                        return text
-
-                    # Tokenize text
-                    def tokenize(text):
-                        text = word_tokenize(text)
-                        return text
-
-                    # Normalisasi text
-                    normalizad_word = pd.read_excel("normal.xlsx")
+                    # removing number
+                    text = re.sub(r"\d+", "", text)
+                    # remove non ASCII (emoticon, chinese word, .etc)
+                    text = text.encode('ascii', 'replace').decode('ascii')
+                    # remove mention, link, hashtag
+                    text = ' '.join(re.sub("([@#][A-Za-z0-9]+)|(\w+:\/\/\S+)", " ", text).split())
+                    # Alphabeth only, exclude number and special character
+                    text = re.sub(r'[^a-zA-Z]', ' ', text)
+                    text = re.sub(r'\b[a-zA-Z]\b', ' ', text)
+                    # replace word repetition with a single occutance ('oooooooo' to 'o')
+                    text = re.sub(r'(.)\1+', r'\1\1', text)
+                    # replace punctations repetitions with a single occurance ('!!!!!!!' to '!')
+                    text = re.sub(r'[\?\.\!]+(?=[\?.\!])', '', text)
+                    # remove multiple whitespace into single whitespace
+                    text = re.sub('\s+', ' ', text)
+                    # remove punctuation
+                    text = text.translate(str.maketrans("", "", string.punctuation))
+                    # Remove double word
+                    text = text.strip()
+                    return text
+                
+                # Fungsi untuk mengubah teks menjadi huruf kecil
+                def casefolding(text):
+                    text = text.lower()
+                    return text
+                
+                # Fungsi untuk tokenisasi teks
+                def tokenize(text):
+                    text = word_tokenize(text)
+                    return text
+                
+                # Fungsi untuk normalisasi teks
+                def load_normalization_file(normalization_file_path):
+                    normalizad_word = pd.read_excel(normalization_file_path)
                     normalizad_word_dict = {}
                     for index, row in normalizad_word.iterrows():
                         if row[0] not in normalizad_word_dict:
                             normalizad_word_dict[row[0]] = row[1]
-
-                    def normalized_term(text):
-                        return [normalizad_word_dict[term] if term in normalizad_word_dict else term for term in text]
-
-                    # Filltering | stopwords removal
-                    def stopword(text):
-                        listStopwords = set(stopwords.words('indonesian'))
-                        filtered = []
-                        for txt in text:
-                            if txt not in listStopwords:
-                                filtered.append(txt)
-                        text = filtered
-                        return text
-
-                    # Remove punctuation
-                    def remove_punct(text):
-                        text = " ".join([char for char in text if char not in string.punctuation])
-                        return text
-
-                    # Deploy Function
-                    st.write("===========================================================")
-                    st.write("Start Pre-processing")
-
-                    st.caption("| cleaning...")
-                    df['cleansing'] = df['content'].apply(cleansing)
-
-                    st.caption("| case folding...")
-                    df['cleansing'] = df['cleansing'].apply(casefolding)
-
-                    st.caption("| tokenizing...")
-                    df['text_tokenize'] = df['cleansing'].apply(tokenize)
-
-                    st.caption("| normalization...")
-                    df['tweet_normalized'] = df['text_tokenize'].apply(normalized_term)
-
-                    st.caption("| removal stopwords...")
-                    df['text_stopword'] = df['tweet_normalized'].apply(stopword)
-
-                    # Remove Puct
-                    df['text_clean'] = df['text_stopword'].apply(lambda x: remove_punct(x))
-
-                    # Remove NaN file
-                    df['text_clean'].replace('', np.nan, inplace=True)
-                    df.dropna(subset=['text_clean'],inplace=True)
-
-                    # Reset index number
-                    df = df.reset_index(drop=True)
-                    st.write("Finish Pre-processing")
-                    st.write("===========================================================")
-                    
-                    # Determine sentiment polarity of doc using indonesia sentiment lexicon
-                    st.write("Count Polarity and Labeling...")
-                    st.caption("using indonesia sentiment lexicon")
-                    import csv
-                    def read_lexicon(file_path, sentiment_value):
-                        lexicon = {}
-                        try:
-                            with open(file_path, 'r', encoding='utf-8') as tsvfile:
-                                reader = csv.reader(tsvfile, delimiter='\t')
-                                for row in reader:
-                                    lexicon[row[0]] = sentiment_value
-                        except Exception as e:
-                            st.write(f"Error reading {file_path}: {e}")
-                        return lexicon
+                    return normalizad_word_dict
                 
-                    # Read positive and negative lexicons
-                    positive_lexicon = read_lexicon(positive_lexicon_path, 1)
-                    negative_lexicon = read_lexicon(negative_lexicon_path, -1)
-                        
-                    # Combine lexicons
-                    lexicon = {**positive_lexicon, **negative_lexicon}
-                        
-                    # Display lexicon for debugging
-                    st.write("Positive Lexicon:", positive_lexicon)
-                    st.write("Negative Lexicon:", negative_lexicon)
-                        
-                    # Function to determine sentiment polarity of text
-                    def sentiment_analysis_lexicon_indonesia(words):
-                        score = 0
-                        try:
-                            for word in words:  # `words` is a list of words
-                                if word in lexicon:
-                                    score += lexicon[word]
-                        except Exception as e:
-                            st.write(f"Error in sentiment analysis: {e}")
-                        
-                        polarity = 'neutral'
-                        if score > 0:
-                            polarity = 'positive'
-                        elif score < 0:
-                            polarity = 'negative'    
-                        return score, polarity    
-                    # Apply sentiment analysis
-                    results = df['text_stopword'].apply(sentiment_analysis_lexicon_indonesia)
-                    results = list(zip(*results))
-                    df['score'] = results[0]
-                    df['sentiment'] = results[1]
-                    
-                    # Display results
-                    st.text(df['sentiment'].value_counts())
-                    st.dataframe(df)
-                    st.download_button(label='Download CSV', data=df.to_csv(index=False, encoding='utf8'), file_name='Labeled_data.csv')    
-        except:
-            st.write('Select The Correct File')
-
+                def normalized_term(text, normalizad_word_dict):
+                    return [normalizad_word_dict.get(term, term) for term in text]
+                
+                # Fungsi untuk menghapus stopwords
+                def stopword(text):
+                    listStopwords = set(stopwords.words('indonesian'))
+                    filtered = [txt for txt in text if txt not in listStopwords]
+                    return filtered
+                
+                # Fungsi untuk menghapus tanda baca
+                def remove_punct(text):
+                    text = " ".join([char for char in text if char not in string.punctuation])
+                    return text
+                
+                # Fungsi untuk membaca lexicon dari file TSV
+                def read_lexicon(file_path):
+                    lexicon = {}
+                    try:
+                        with open(file_path, 'r', encoding='utf-8') as tsvfile:
+                            reader = csv.reader(tsvfile, delimiter='\t')
+                            for row in reader:
+                                lexicon[row[0]] = float(row[1])  # Ambil skor langsung dari lexicon TSV
+                    except Exception as e:
+                        st.write(f"Error reading {file_path}: {e}")
+                    return lexicon
+                
+                # Fungsi untuk analisis sentimen menggunakan lexicon
+                def sentiment_analysis_lexicon_indonesia(words, lexicon):
+                    score = 0
+                    try:
+                        for word in words:
+                            if word in lexicon:
+                                score += lexicon[word]
+                    except Exception as e:
+                        st.write(f"Error in sentiment analysis: {e}")
+                
+                    polarity = 'neutral'
+                    if score > 0:
+                        polarity = 'positive'
+                    elif score < 0:
+                        polarity = 'negative'
+                    return score, polarity
+                
+                # Streamlit tab untuk unggah dan proses file
+                with st.tab("Process"):
+                    try:
+                        data_file = st.file_uploader("Upload CSV file", type=["csv"])
+                        if data_file is not None:
+                            df = pd.read_csv(data_file)
+                            st.dataframe(df)
+                
+                            proses = st.button('Start process')
+                
+                            if "prosess" not in st.session_state:
+                                st.session_state.prosess = False
+                
+                            def callback():
+                                st.session_state.prosess = False
+                
+                            if proses or st.session_state.prosess:
+                                st.session_state.prosess = True
+                
+                                st.write("===========================================================")
+                                st.write("Start Pre-processing")
+                
+                                st.caption("| cleaning...")
+                                df['cleansing'] = df['content'].apply(cleansing)
+                
+                                st.caption("| case folding...")
+                                df['cleansing'] = df['cleansing'].apply(casefolding)
+                
+                                st.caption("| tokenizing...")
+                                df['text_tokenize'] = df['cleansing'].apply(tokenize)
+                
+                                st.caption("| normalization...")
+                                normalizad_word_dict = load_normalization_file('normal.xlsx')
+                                df['tweet_normalized'] = df['text_tokenize'].apply(lambda x: normalized_term(x, normalizad_word_dict))
+                
+                                st.caption("| removal stopwords...")
+                                df['text_stopword'] = df['tweet_normalized'].apply(stopword)
+                
+                                st.caption("| remove punctuation...")
+                                df['text_clean'] = df['text_stopword'].apply(lambda x: remove_punct(x))
+                
+                                st.caption("| remove NaN files...")
+                                df['text_clean'].replace('', np.nan, inplace=True)
+                                df.dropna(subset=['text_clean'], inplace=True)
+                
+                                st.caption("| reset index...")
+                                df = df.reset_index(drop=True)
+                                st.write("Finish Pre-processing")
+                                st.write("===========================================================")
+                
+                                st.write("Count Polarity and Labeling...")
+                                st.caption("using indonesia sentiment lexicon")
+                
+                                # Read positive and negative lexicons
+                                positive_lexicon = read_lexicon('positive.tsv')
+                                negative_lexicon = read_lexicon('negative.tsv')
+                
+                                # Combine lexicons
+                                lexicon = {**positive_lexicon, **negative_lexicon}
+                
+                                st.write("Positive Lexicon:", positive_lexicon)
+                                st.write("Negative Lexicon:", negative_lexicon)
+                
+                                # Apply sentiment analysis
+                                results = df['text_stopword'].apply(lambda x: sentiment_analysis_lexicon_indonesia(x, lexicon))
+                                results = list(zip(*results))
+                                df['score'] = results[0]
+                                df['sentiment'] = results[1]
+                
+                                st.text(df['sentiment'].value_counts())
+                                st.dataframe(df)
+                                st.download_button(label='Download CSV', data=df.to_csv(index=False, encoding='utf8'), file_name='Labeled_data.csv')
+                
+                    except Exception as e:
+                        st.write('An error occurred: {}'.format(e))
 
     with tab3:
         try:
