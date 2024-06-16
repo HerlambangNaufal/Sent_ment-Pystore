@@ -76,7 +76,7 @@ def main():
                 df = df.copy().rename(columns={ 'score': 'star'})
 
                 st.dataframe(df)
-                st.download_button(label='Download CSV', data = df.to_csv(index=False, encoding='utf8'), file_name=url+'.csv', on_click=callback)
+                st.download_button(label='Download CSV', data = df.to_csv(index=False, encoding='utf8'), file_name='Labeled_'+url+'.csv',on_click=callback)
 
             except:
                 st.write('Enter The Correct Link')
