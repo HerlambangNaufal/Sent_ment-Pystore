@@ -217,11 +217,7 @@ def main():
                     
                     # Combine lexicons
                     lexicon = {**positive_lexicon, **negative_lexicon}
-                    
-                    # Display lexicon for debugging
-                    st.write("Positive Lexicon:", positive_lexicon)
-                    st.write("Negative Lexicon:", negative_lexicon)
-                    
+
                     # Function to determine sentiment polarity of text
                     def sentiment_analysis_lexicon_indonesia(text):
                         score = 0
