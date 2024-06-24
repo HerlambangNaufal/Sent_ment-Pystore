@@ -217,8 +217,8 @@ def main():
                             else:
                                 step['sentiment_value'] = 0
         
-        step['current_score'] = score
-        steps.append(step)
+                            step['current_score'] = score
+                            steps.append(step)
 
                         polarity=''
                         if (score > 0):
