@@ -233,9 +233,25 @@ def main():
                     results = list(zip(*results))
                     df['score'] = results[0]
                     df['sentiment'] = results[1]
+                    # Menyiapkan dataframe untuk menampilkan langkah-langkah
+                    steps_df = pd.DataFrame()
+                    for idx, step_list in enumerate(results[2]):
+                        step_df = pd.DataFrame(step_list)
+                        step_df['index'] = idx
+                        steps_df = pd.concat([steps_df, step_df])
+
+                    # Menampilkan nilai polaritas yang dihitung
+                    st.text(df['sentiment'].value_counts())
+                    
+                    # Menampilkan dataframe utama
+                    st.dataframe(df)
+                    
+                    # Menampilkan langkah-langkah dari penggunaan leksikon
+                    st.dataframe(steps_df)
+
                     st.text(df['sentiment'].value_counts())
 
-                    st.dataframe(df)
+                    st.dataframe(steps_df)
                     st.download_button(label='Download CSV', data = df.to_csv(index=False, encoding='utf8'), file_name='Labeled_'+url+'.csv',on_click=callback)
 
         except:
