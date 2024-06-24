@@ -205,9 +205,20 @@ def main():
                     def sentiment_analysis_lexicon_indonesia(text):
                         #for word in text:
                         score = 0
+                        steps = []  # Menyimpan langkah-langkah untuk dipantau
                         for word in text:
+                            step = {} #Hapus
+                            step['word'] = word #Hapus
                             if (word in lexicon):
-                                score = score + lexicon[word]
+                                sentiment_value = lexicon[word] # Hapus
+                                step['sentiment_value'] = sentiment_value # Hapus
+                                score += sentiment_value # Hapus
+                                #score = score + lexicon[word]
+                            else:
+                                step['sentiment_value'] = 0
+        
+        step['current_score'] = score
+        steps.append(step)
 
                         polarity=''
                         if (score > 0):
