@@ -205,21 +205,10 @@ def main():
                     def sentiment_analysis_lexicon_indonesia(text):
                         #for word in text:
                         score = 0
-                        steps = []  # Menyimpan langkah-langkah untuk dipantau
                         for word in text:
-                            step = {} #Hapus
-                            step['word'] = word #Hapus
                             if (word in lexicon):
-                                sentiment_value = lexicon[word] # Hapus
-                                step['sentiment_value'] = sentiment_value # Hapus
-                                score += sentiment_value # Hapus
                                 #score = score + lexicon[word]
-                            else:
-                                step['sentiment_value'] = 0
-        
-                            step['current_score'] = score
-                            steps.append(step)
-
+                                
                         polarity=''
                         if (score > 0):
                             polarity = 'positive'
@@ -227,31 +216,15 @@ def main():
                             polarity = 'negative'
                         else:
                             polarity = 'neutral'
-                        return score, polarity, step
+                        return score, polarity
 
                     results = df['text_stopword'].apply(sentiment_analysis_lexicon_indonesia)
                     results = list(zip(*results))
                     df['score'] = results[0]
                     df['sentiment'] = results[1]
-                    # Menyiapkan dataframe untuk menampilkan langkah-langkah
-                    steps_df = pd.DataFrame()
-                    for idx, step_list in enumerate(results[2]):
-                        step_df = pd.DataFrame(step_list)
-                        step_df['index'] = idx
-                        steps_df = pd.concat([steps_df, step_df])
 
-                    # Menampilkan nilai polaritas yang dihitung
                     st.text(df['sentiment'].value_counts())
-                    
-                    # Menampilkan dataframe utama
                     st.dataframe(df)
-                    
-                    # Menampilkan langkah-langkah dari penggunaan leksikon
-                    st.dataframe(steps_df)
-
-                    st.text(df['sentiment'].value_counts())
-
-                    st.dataframe(steps_df)
                     st.download_button(label='Download CSV', data = df.to_csv(index=False, encoding='utf8'), file_name='Labeled_'+url+'.csv',on_click=callback)
 
         except:
