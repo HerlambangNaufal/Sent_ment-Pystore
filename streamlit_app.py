@@ -207,7 +207,7 @@ def main():
                         score = 0
                         for word in text:
                             if (word in lexicon):
-                                #score = score + lexicon[word]
+                                score = score + lexicon[word]
                                 
                         polarity=''
                         if (score > 0):
