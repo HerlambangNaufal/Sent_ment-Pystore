@@ -227,7 +227,7 @@ def main():
                             polarity = 'negative'
                         else:
                             polarity = 'neutral'
-                        return score, polarity
+                        return score, polarity, step
 
                     results = df['text_stopword'].apply(sentiment_analysis_lexicon_indonesia)
                     results = list(zip(*results))
