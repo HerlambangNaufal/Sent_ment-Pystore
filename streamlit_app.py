@@ -209,7 +209,7 @@ def main():
                             polarity = 'negative'
                         return score, polarity
 
-                    results = df['text_steamming'].apply(sentiment_analysis_lexicon_indonesia)
+                    results = df['text_stopword'].apply(sentiment_analysis_lexicon_indonesia)
                     results = list(zip(*results))
                     df['score'] = results[0]
                     df['sentiment'] = results[1]
