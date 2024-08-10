@@ -82,7 +82,7 @@ def main():
                 st.write('Enter The Correct Link')
 
     # Pre-Processing & Labeling
-    with tab2:
+     with tab2:
         try:
             data_file = st.file_uploader("Upload CSV file",type=["csv"])            
             if data_file is not None :
@@ -154,7 +154,6 @@ def main():
                         text = filtered 
                         return text
 
-
                     # Remove punctuation
                     def remove_punct(text):
                         text = " ".join([char for char in text if char not in string.punctuation])
@@ -168,10 +167,10 @@ def main():
                     df['cleansing'] = df['content'].apply(cleansing)
 
                     st.caption("| case folding...")
-                    df['casefolding'] = df['cleansing'].apply(casefolding)
+                    df['cleansing'] = df['cleansing'].apply(casefolding)
 
                     st.caption("| tokenizing...")
-                    df['text_tokenize'] = df['casefolding'].apply(tokenize)
+                    df['text_tokenize'] = df['cleansing'].apply(tokenize)
 
                     st.caption("| normalization...")
                     df['tweet_normalized'] = df['text_tokenize'].apply(normalized_term)
@@ -196,7 +195,7 @@ def main():
                     st.caption("using indonesia sentiment lexicon")
                     lexicon = dict()
                     import csv
-                    with open('InSet_Lexicon.csv', 'r') as csvfile:
+                    with open('modified3_full_lexicon.csv', 'r') as csvfile:
                         reader = csv.reader(csvfile, delimiter=',')
                         for row in reader:
                             lexicon[row[0]] = int(row[1])
@@ -208,7 +207,7 @@ def main():
                         for word in text:
                             if (word in lexicon):
                                 score = score + lexicon[word]
-                                
+
                         polarity=''
                         if (score > 0):
                             polarity = 'positive'
@@ -218,12 +217,12 @@ def main():
                             polarity = 'neutral'
                         return score, polarity
 
-                    results = df['text_stopword'].apply(sentiment_analysis_lexicon_indonesia)
+                    results = df['text_steamming'].apply(sentiment_analysis_lexicon_indonesia)
                     results = list(zip(*results))
                     df['score'] = results[0]
                     df['sentiment'] = results[1]
-
                     st.text(df['sentiment'].value_counts())
+
                     st.dataframe(df)
                     st.download_button(label='Download CSV', data = df.to_csv(index=False, encoding='utf8'), file_name='Labeled_'+url+'.csv',on_click=callback)
 
