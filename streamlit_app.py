@@ -163,6 +163,8 @@ def main():
 
                     st.caption("| tokenizing...")
                     df['text_tokenize'] = df['cleansing'].apply(tokenize)
+                    except Exception as e:
+                        st.error(f"Error during tokenizing: {e}")
 
                     st.caption("| normalization...")
                     df['tweet_normalized'] = df['text_tokenize'].apply(normalized_term)
