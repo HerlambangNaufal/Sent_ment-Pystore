@@ -203,7 +203,7 @@ def main():
                         polarity=''
                         if (score > 0):
                             polarity = 'positive'
-                        elif (score = 0):
+                        elif (score == 0):
                             polarity = 'neutral'
                         else:
                             polarity = 'negative'
