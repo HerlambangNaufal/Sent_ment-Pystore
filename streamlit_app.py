@@ -146,13 +146,6 @@ def main():
                         text = filtered 
                         return text
 
-                    # Stremming text 
-                    def steamming(text):
-                        factory = StemmerFactory()
-                        stemmer = factory.create_stemmer()
-                        text = [stemmer.stem(word) for word in text]
-                        return text
-
                     # Remove punctuation
                     def remove_punct(text):
                         text = " ".join([char for char in text if char not in string.punctuation])
@@ -177,11 +170,8 @@ def main():
                     st.caption("| removal stopwords...")
                     df['text_stopword'] = df['tweet_normalized'].apply(stopword)
 
-                    st.caption("| steamming...")
-                    df['text_steamming'] = df['text_stopword'].apply(steamming)
-
                     # Remove Puct 
-                    df['text_clean'] = df['text_steamming'].apply(lambda x: remove_punct(x))
+                    df['text_clean'] = df['text_stopword'].apply(lambda x: remove_punct(x))
 
                     # Remove NaN file
                     df['text_clean'].replace('', np.nan, inplace=True)
