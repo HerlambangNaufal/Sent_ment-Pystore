@@ -187,7 +187,7 @@ def main():
                     st.caption("using indonesia sentiment lexicon")
                     lexicon = dict()
                     import csv
-                    with open('modified3_full_lexicon.csv', 'r') as csvfile:
+                    with open('InSet_Lexicon.csv', 'r') as csvfile:
                         reader = csv.reader(csvfile, delimiter=',')
                         for row in reader:
                             lexicon[row[0]] = int(row[1])
@@ -203,10 +203,10 @@ def main():
                         polarity=''
                         if (score > 0):
                             polarity = 'positive'
-                        elif (score < 0):
-                            polarity = 'negative'
-                        else:
+                        elif (score = 0):
                             polarity = 'neutral'
+                        else:
+                            polarity = 'negative'
                         return score, polarity
 
                     results = df['text_steamming'].apply(sentiment_analysis_lexicon_indonesia)
