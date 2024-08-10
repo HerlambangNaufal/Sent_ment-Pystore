@@ -160,9 +160,9 @@ def main():
 
                     st.caption("| case folding...")
                     df['cleansing'] = df['cleansing'].apply(casefolding)
-
-                    st.caption("| tokenizing...")
-                    df['text_tokenize'] = df['cleansing'].apply(tokenize)
+                    try:
+                        st.caption("| tokenizing...")
+                        df['text_tokenize'] = df['cleansing'].apply(tokenize)
                     except Exception as e:
                         st.error(f"Error during tokenizing: {e}")
 
