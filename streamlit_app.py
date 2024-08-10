@@ -82,7 +82,7 @@ def main():
                 st.write('Enter The Correct Link')
 
     # Pre-Processing & Labeling
-     with tab2:
+    with tab2:
         try:
             data_file = st.file_uploader("Upload CSV file",type=["csv"])            
             if data_file is not None :
