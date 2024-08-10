@@ -167,10 +167,10 @@ def main():
                     df['cleansing'] = df['content'].apply(cleansing)
 
                     st.caption("| case folding...")
-                    df['cleansing'] = df['cleansing'].apply(casefolding)
+                    df['casefolding'] = df['cleansing'].apply(casefolding)
 
                     st.caption("| tokenizing...")
-                    df['text_tokenize'] = df['cleansing'].apply(tokenize)
+                    df['text_tokenize'] = df['casefolding'].apply(tokenize)
 
                     st.caption("| normalization...")
                     df['tweet_normalized'] = df['text_tokenize'].apply(normalized_term)
