@@ -127,7 +127,7 @@ def main():
                         return text
 
                     # Normalisasi text
-                    normalizad_word = pd.read_excel("normal.xlsx")
+                    normalizad_word = pd.read_excel("colloquial-indonesian-lexicon.csv")
                     normalizad_word_dict = {}
                     for index, row in normalizad_word.iterrows():
                         if row[0] not in normalizad_word_dict:
