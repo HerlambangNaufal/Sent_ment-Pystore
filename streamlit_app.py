@@ -303,6 +303,7 @@ def main():
                     plt.axis('off')
                     st.pyplot(fig)
                 except:
+                    st.write('tidak ada sentiment neutral pada data')
 
                 try:
                     st.write('Pie Chart')
