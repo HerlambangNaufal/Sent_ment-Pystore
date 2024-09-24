@@ -360,71 +360,71 @@ def main():
             st.write('Select The Correct File')
 
     with tab4:
-    try:
-        data_file = st.file_uploader("Upload labeled CSV file",type=["csv"])
-        if data_file is not None:
-            df = pd.read_csv(data_file)
-            st.dataframe(df)
-
-            if len(df) < 2:
-                st.write("Dataset terlalu sedikit untuk evaluasi model.")
-            else:
-                proseseval = st.button('Start process')
-
-                if "evalmodel" not in st.session_state:
-                    st.session_state.evalmodel = False
-
-                def callback():
-                    st.session_state.evalmodel = False
-
-                if proseseval or st.session_state.evalmodel:
-                    st.session_state.evalmodel = True
-
-                    st.write("\n Counting SVM Accuracy...")
-
-                    def score_sentiment(score):
-                        if score == 'positive':
-                            return "positive"
-                        elif score == 'negative':
-                            return "negative"
-                        else:
-                            return "neutral"
-
-                    biner = df['sentiment'].apply(score_sentiment)
-
-                    X_train, X_test, Y_train, Y_test = train_test_split(df['text_clean'], biner, test_size=0.2, stratify=biner, random_state=42)
-
-                    vectorizer = TfidfVectorizer()
-                    X_train = vectorizer.fit_transform(X_train)
-                    X_test = vectorizer.transform(X_test)
-
-                    clfsvm = svm.SVC(kernel="linear")
-                    clfsvm.fit(X_train, Y_train)
-                    predict = clfsvm.predict(X_test)
-
-                    st.write("SVM Accuracy score  -> ", accuracy_score(predict, Y_test)*100)
-                    st.write("SVM Recall Score    -> ", recall_score(predict, Y_test, average='macro')*100)
-                    st.write("SVM Precision score -> ", precision_score(predict, Y_test, average='macro')*100)
-                    st.write("SVM f1 score        -> ", f1_score(predict, Y_test, average='macro')*100)
-                    st.write("===========================================================")
-
-                    # Confusion Matrix plot
-                    cm = confusion_matrix(predict, Y_test)
-                    fig, ax = plt.subplots(figsize=(8, 6))
-                    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
-                                xticklabels=["negative", "neutral", "positive"],
-                                yticklabels=["negative", "neutral", "positive"], ax=ax)
-                    ax.set_xlabel("Predicted Labels")
-                    ax.set_ylabel("True Labels")
-                    ax.set_title("Confusion Matrix")
-                    st.pyplot(fig)
-
-                    st.write("===========================================================")
-                    st.text('classification report : \n'+ classification_report(predict, Y_test, zero_division=0))
-                    st.write("===========================================================")
-
-    except Exception as e:
-        st.write(f'Terjadi kesalahan: {e}')
+        try:
+            data_file = st.file_uploader("Upload labeled CSV file",type=["csv"])
+            if data_file is not None:
+                df = pd.read_csv(data_file)
+                st.dataframe(df)
+    
+                if len(df) < 2:
+                    st.write("Dataset terlalu sedikit untuk evaluasi model.")
+                else:
+                    proseseval = st.button('Start process')
+    
+                    if "evalmodel" not in st.session_state:
+                        st.session_state.evalmodel = False
+    
+                    def callback():
+                        st.session_state.evalmodel = False
+    
+                    if proseseval or st.session_state.evalmodel:
+                        st.session_state.evalmodel = True
+    
+                        st.write("\n Counting SVM Accuracy...")
+    
+                        def score_sentiment(score):
+                            if score == 'positive':
+                                return "positive"
+                            elif score == 'negative':
+                                return "negative"
+                            else:
+                                return "neutral"
+    
+                        biner = df['sentiment'].apply(score_sentiment)
+    
+                        X_train, X_test, Y_train, Y_test = train_test_split(df['text_clean'], biner, test_size=0.2, stratify=biner, random_state=42)
+    
+                        vectorizer = TfidfVectorizer()
+                        X_train = vectorizer.fit_transform(X_train)
+                        X_test = vectorizer.transform(X_test)
+    
+                        clfsvm = svm.SVC(kernel="linear")
+                        clfsvm.fit(X_train, Y_train)
+                        predict = clfsvm.predict(X_test)
+    
+                        st.write("SVM Accuracy score  -> ", accuracy_score(predict, Y_test)*100)
+                        st.write("SVM Recall Score    -> ", recall_score(predict, Y_test, average='macro')*100)
+                        st.write("SVM Precision score -> ", precision_score(predict, Y_test, average='macro')*100)
+                        st.write("SVM f1 score        -> ", f1_score(predict, Y_test, average='macro')*100)
+                        st.write("===========================================================")
+    
+                        # Confusion Matrix plot
+                        cm = confusion_matrix(predict, Y_test)
+                        fig, ax = plt.subplots(figsize=(8, 6))
+                        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
+                                    xticklabels=["negative", "neutral", "positive"],
+                                    yticklabels=["negative", "neutral", "positive"], ax=ax)
+                        ax.set_xlabel("Predicted Labels")
+                        ax.set_ylabel("True Labels")
+                        ax.set_title("Confusion Matrix")
+                        st.pyplot(fig)
+    
+                        st.write("===========================================================")
+                        st.text('classification report : \n'+ classification_report(predict, Y_test, zero_division=0))
+                        st.write("===========================================================")
+    
+        except Exception as e:
+            st.write(f'Terjadi kesalahan: {e}')
 
 
 if __name__ == '__main__':
