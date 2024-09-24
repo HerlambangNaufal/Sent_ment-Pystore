@@ -408,9 +408,9 @@ def main():
                     X_train = vectorizer.fit_transform(X_train)
                     X_test = vectorizer.transform(X_test)
 
-                    clfsvm = svm.SVC(kernel="linear")
-                    clfsvm.fit(X_train,Y_train)
-                    predict = clfsvm.predict(X_test)
+                    clf_rbf = svm.SVC(kernel='rbf', C=1.0, gamma='scale')
+                    clf_rbf.fit(X_train, Y_train)
+                    predict = clf_rbf.predict(X_test)
 
                     st.write("SVM Accuracy score  -> ", accuracy_score(predict, Y_test)*100)
                     st.write("SVM Recall Score    -> ", recall_score(predict, Y_test, average='macro')*100)
