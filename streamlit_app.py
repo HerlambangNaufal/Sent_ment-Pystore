@@ -391,6 +391,11 @@ def main():
                     biner = df['sentiment'].apply(score_sentiment)
 
                     X_train, X_test, Y_train, Y_test = train_test_split(df['text_clean'], biner, test_size=0.2, stratify=biner, random_state=42)
+                    # Jumlah data latih
+                    st.write(f"Jumlah data latih: {len(X_train)}")
+                    
+                    # Jumlah data uji
+                    st.write(f"Jumlah data uji: {len(X_test)}")
 
                     vectorizer = TfidfVectorizer()
                     X_train = vectorizer.fit_transform(X_train)
