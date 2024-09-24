@@ -381,11 +381,11 @@ def main():
 
                     def score_sentiment(score):
                         if score == 'positive':
-                            return 1
+                            return "positive"
                         elif score == 'negative':
-                            return -1
+                            return "negative"
                         else:
-                            return 0
+                            return "neutral"
 
                     biner = df['sentiment'].apply(score_sentiment)
 
