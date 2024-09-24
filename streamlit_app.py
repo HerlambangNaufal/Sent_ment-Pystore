@@ -404,7 +404,16 @@ def main():
                     st.write("SVM Precision score -> ", precision_score(predict, Y_test, average='macro')*100)
                     st.write("SVM f1 score        -> ", f1_score(predict, Y_test, average='macro')*100)
                     st.write("===========================================================")
-                    st.write('confusion matrix : \n', confusion_matrix(predict, Y_test))
+                    cm = confusion_matrix(predict, Y_test)
+                    # Buat heatmap dari confusion matrix
+                    plt.figure(figsize=(8, 6))
+                    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
+                                xticklabels=["negative", "neutral", "positive"],
+                                yticklabels=["negative", "neutral", "positive"])
+                    plt.xlabel("Predicted Labels")
+                    plt.ylabel("True Labels")
+                    plt.title("Confusion Matrix")
+                    plt.show()
                     st.write("===========================================================")
                     st.text('classification report : \n'+ classification_report(predict, Y_test, zero_division=0))
                     st.write("===========================================================")
