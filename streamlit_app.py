@@ -6,12 +6,12 @@ import numpy as np
 import re
 import string
 import nltk
+import seaborn as sns
 nltk.download('punkt_tab')
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
-import seaborn as sns
 import matplotlib.pyplot as plt
 from PIL import Image
 from wordcloud import WordCloud, STOPWORDS
@@ -361,6 +361,7 @@ def main():
 
     with tab4:
         try:
+            import seaborn as sns
             data_file = st.file_uploader("Upload labeled CSV file",type=["csv"])
             if data_file is not None :
                 df = pd.read_csv(data_file)
