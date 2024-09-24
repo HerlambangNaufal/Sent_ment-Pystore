@@ -12,3 +12,4 @@ regex
 svm
 openpyxl
 plotly
+seaborn
