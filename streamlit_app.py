@@ -419,7 +419,7 @@ def main():
                     st.write("===========================================================")
 
         except:
-            st.write('Dataset terlalu sedikit')
+            st.write(f'Terjadi kesalahan: {e}')
 
 if __name__ == '__main__':
     main()
