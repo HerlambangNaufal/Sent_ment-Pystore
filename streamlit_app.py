@@ -392,7 +392,14 @@ def main():
 
                     X_train, X_test, Y_train, Y_test = train_test_split(df['text_clean'], biner, test_size=0.2, stratify=biner, random_state=42)
                     # Jumlah data latih
-                    st.write(f"Jumlah data latih: {len(X_train)}")
+                    jumlah_data_latih_positive = sum(Y_train == "positive")
+                    jumlah_data_latih_negative = sum(Y_train == "negative")
+                    jumlah_data_latih_neutral = sum(Y_train == "neutral")
+
+                    st.write("Data Latih:")
+                    st.write(f"Jumlah data latih dengan sentimen positive: {jumlah_data_latih_positive}")
+                    st.write(f"Jumlah data latih dengan sentimen negative: {jumlah_data_latih_negative}")
+                    st.write(f"Jumlah data latih dengan sentimen neutral: {jumlah_data_latih_neutral}")
                     
                     # Jumlah data uji
                     st.write(f"Jumlah data uji: {len(X_test)}")
