@@ -408,7 +408,7 @@ def main():
                     X_train = vectorizer.fit_transform(X_train)
                     X_test = vectorizer.transform(X_test)
 
-                    clf_rbf = svm.SVC(kernel='rbf', C=1.0, gamma='scale')
+                    clf_rbf = svm.SVC(kernel='rbf')
                     clf_rbf.fit(X_train, Y_train)
                     predict = clf_rbf.predict(X_test)
 
