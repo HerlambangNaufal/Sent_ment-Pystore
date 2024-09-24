@@ -404,23 +404,7 @@ def main():
                     st.write("SVM Precision score -> ", precision_score(predict, Y_test, average='macro')*100)
                     st.write("SVM f1 score        -> ", f1_score(predict, Y_test, average='macro')*100)
                     st.write("===========================================================")
-                    # Generate confusion matrix
-                    cm = confusion_matrix(predict, Y_test)
-                    
-                    # Plot the confusion matrix
-                    fig, ax = plt.subplots(figsize=(6, 4))
-                    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False, ax=ax)
-                    
-                    # Set labels and title
-                    ax.set_title('Confusion Matrix', fontsize=18)
-                    ax.set_xlabel('Predicted', fontsize=12)
-                    ax.set_ylabel('Actual', fontsize=12)
-                    ax.set_xticklabels(['Negative', 'Neutral', 'Positive'], fontsize=10)
-                    ax.set_yticklabels(['Negative', 'Neutral', 'Positive'], fontsize=10)
-                    
-                    # Show plot in Streamlit
-                    st.pyplot(fig)
-
+                    st.write('confusion matrix : \n', confusion_matrix(predict, Y_test))
                     st.write("===========================================================")
                     st.text('classification report : \n'+ classification_report(predict, Y_test, zero_division=0))
                     st.write("===========================================================")
