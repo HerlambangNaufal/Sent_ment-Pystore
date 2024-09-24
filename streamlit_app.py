@@ -360,13 +360,16 @@ def main():
             st.write('Select The Correct File')
 
     with tab4:
-        try:
-            data_file = st.file_uploader("Upload labeled CSV file",type=["csv"])
-            if data_file is not None :
-                df = pd.read_csv(data_file)
-                st.dataframe(df)
+    try:
+        data_file = st.file_uploader("Upload labeled CSV file",type=["csv"])
+        if data_file is not None:
+            df = pd.read_csv(data_file)
+            st.dataframe(df)
 
-                proseseval = st.button('Start processs')
+            if len(df) < 2:
+                st.write("Dataset terlalu sedikit untuk evaluasi model.")
+            else:
+                proseseval = st.button('Start process')
 
                 if "evalmodel" not in st.session_state:
                     st.session_state.evalmodel = False
@@ -396,7 +399,7 @@ def main():
                     X_test = vectorizer.transform(X_test)
 
                     clfsvm = svm.SVC(kernel="linear")
-                    clfsvm.fit(X_train,Y_train)
+                    clfsvm.fit(X_train, Y_train)
                     predict = clfsvm.predict(X_test)
 
                     st.write("SVM Accuracy score  -> ", accuracy_score(predict, Y_test)*100)
@@ -404,22 +407,25 @@ def main():
                     st.write("SVM Precision score -> ", precision_score(predict, Y_test, average='macro')*100)
                     st.write("SVM f1 score        -> ", f1_score(predict, Y_test, average='macro')*100)
                     st.write("===========================================================")
+
+                    # Confusion Matrix plot
                     cm = confusion_matrix(predict, Y_test)
-                    # Buat heatmap dari confusion matrix
-                    plt.figure(figsize=(8, 6))
+                    fig, ax = plt.subplots(figsize=(8, 6))
                     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
                                 xticklabels=["negative", "neutral", "positive"],
-                                yticklabels=["negative", "neutral", "positive"])
-                    plt.xlabel("Predicted Labels")
-                    plt.ylabel("True Labels")
-                    plt.title("Confusion Matrix")
-                    st.pyplot()
+                                yticklabels=["negative", "neutral", "positive"], ax=ax)
+                    ax.set_xlabel("Predicted Labels")
+                    ax.set_ylabel("True Labels")
+                    ax.set_title("Confusion Matrix")
+                    st.pyplot(fig)
+
                     st.write("===========================================================")
                     st.text('classification report : \n'+ classification_report(predict, Y_test, zero_division=0))
                     st.write("===========================================================")
 
-        except:
-            st.write(f'Terjadi kesalahan: {e}')
+    except Exception as e:
+        st.write(f'Terjadi kesalahan: {e}')
+
 
 if __name__ == '__main__':
     main()
