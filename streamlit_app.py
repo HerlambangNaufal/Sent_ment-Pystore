@@ -408,7 +408,7 @@ def main():
                     X_train = vectorizer.fit_transform(X_train)
                     X_test = vectorizer.transform(X_test)
 
-                    lfsvm = svm.SVC(kernel="linear")
+                    clfsvm = svm.SVC(kernel="linear")
                     clfsvm.fit(X_train,Y_train)
                     predict = clfsvm.predict(X_test)
 
