@@ -67,12 +67,12 @@ def main():
                     if continuation_token is None:
                         break
     
-                # Convert to DataFrame and filter by year (2023-2024)
+                # Convert to DataFrame and filter by year (2021-2024)
                 df = pd.DataFrame(np.array(result), columns=['review'])
                 df = df.join(pd.DataFrame(df.pop('review').tolist()))
                 df = df[['userName', 'score', 'at', 'content']]
                 df['at'] = pd.to_datetime(df['at'])
-                df = df[df['at'].dt.year.isin([2022, 2023, 2024])]
+                df = df[df['at'].dt.year.isin([2021, 2022, 2023, 2024])]
     
                 # Display filtered data and provide download option
                 st.dataframe(df)
