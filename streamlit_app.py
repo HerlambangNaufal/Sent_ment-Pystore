@@ -33,53 +33,53 @@ def main():
 
     # Scraping Data
     with tab1:
-    with st.form(key='my-form'):
-        url = st.text_input('Enter Link Apps')
-        counts = st.number_input('amount of data', min_value=50 ,step=1)
-        submit = st.form_submit_button('Submit')
-
-    if "submits" not in st.session_state:
-        st.session_state.submits = False
-
-    def callback():
-        st.session_state.submits = False
-
-    if submit or st.session_state.submits:
-        st.session_state.submits = True
-        try:
-            # Initialize empty list for results and continuation token
-            result = []
-            continuation_token = None
-
-            # Loop until desired count is reached or there are no more reviews
-            while len(result) < counts:
-                reviews_batch, continuation_token = reviews(
-                    url,
-                    lang='id',
-                    country='id',
-                    sort=Sort.NEWEST,
-                    count=min(counts - len(result), 100),  # Limit to 100 per batch for efficiency
-                    continuation_token=continuation_token
-                )
-                result.extend(reviews_batch)
-
-                # Stop if there are no more reviews
-                if continuation_token is None:
-                    break
-
-            # Convert to DataFrame and filter by year (2023-2024)
-            df = pd.DataFrame(np.array(result), columns=['review'])
-            df = df.join(pd.DataFrame(df.pop('review').tolist()))
-            df = df[['userName', 'score', 'at', 'content']]
-            df['at'] = pd.to_datetime(df['at'])
-            df = df[df['at'].dt.year.isin([2023, 2024])]
-
-            # Display filtered data and provide download option
-            st.dataframe(df)
-            st.download_button(label='Download CSV', data=df.to_csv(index=False, encoding='utf8'), file_name='Labeled_'+url+'.csv', on_click=callback)
-
-        except Exception as e:
-            st.write(f'Error: {e}')
+        with st.form(key='my-form'):
+            url = st.text_input('Enter Link Apps')
+            counts = st.number_input('amount of data', min_value=50 ,step=1)
+            submit = st.form_submit_button('Submit')
+    
+        if "submits" not in st.session_state:
+            st.session_state.submits = False
+    
+        def callback():
+            st.session_state.submits = False
+    
+        if submit or st.session_state.submits:
+            st.session_state.submits = True
+            try:
+                # Initialize empty list for results and continuation token
+                result = []
+                continuation_token = None
+    
+                # Loop until desired count is reached or there are no more reviews
+                while len(result) < counts:
+                    reviews_batch, continuation_token = reviews(
+                        url,
+                        lang='id',
+                        country='id',
+                        sort=Sort.NEWEST,
+                        count=min(counts - len(result), 100),  # Limit to 100 per batch for efficiency
+                        continuation_token=continuation_token
+                    )
+                    result.extend(reviews_batch)
+    
+                    # Stop if there are no more reviews
+                    if continuation_token is None:
+                        break
+    
+                # Convert to DataFrame and filter by year (2023-2024)
+                df = pd.DataFrame(np.array(result), columns=['review'])
+                df = df.join(pd.DataFrame(df.pop('review').tolist()))
+                df = df[['userName', 'score', 'at', 'content']]
+                df['at'] = pd.to_datetime(df['at'])
+                df = df[df['at'].dt.year.isin([2023, 2024])]
+    
+                # Display filtered data and provide download option
+                st.dataframe(df)
+                st.download_button(label='Download CSV', data=df.to_csv(index=False, encoding='utf8'), file_name='Labeled_'+url+'.csv', on_click=callback)
+    
+            except Exception as e:
+                st.write(f'Error: {e}')
 
 
     # Pre-Processing & Labeling
