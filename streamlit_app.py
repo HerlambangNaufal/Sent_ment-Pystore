@@ -365,7 +365,7 @@ def main():
                     st.write('error')
                     
                 st.write("====================================================================")
-                st.subheader("Analisis Perbandingan Tahun")
+                st.subheader("Analisis Perbandingan Tahun dan Alasan Penurunan")
 
                 # Filter Data Berdasarkan Tahun
                 df['at'] = pd.to_datetime(df['at'])
@@ -391,7 +391,7 @@ def main():
                 avg_rating_per_year.plot(kind='line', marker='o', ax=ax)
                 ax.set_title("Rata-Rata Rating per Tahun", fontsize=16)
                 ax.set_xlabel("Tahun")
-                ax.set_ylabel("Rata-Rata Rating")
+                ax.set_ylabel("Rata-Rata Rating (1-5)")
                 ax.grid(True)
                 st.pyplot(fig)
 
@@ -418,6 +418,27 @@ def main():
                         st.pyplot(fig)
                     else:
                         st.write(f"Tidak ada ulasan negatif untuk tahun {year}.")
+
+                # Aspect-Based Sentiment Analysis (Opsional)
+                st.write("====================================================================")
+                st.subheader("Analisis Sentimen Berdasarkan Fitur Aplikasi")
+                # Daftar fitur yang mungkin muncul di ulasan
+                fitur = ["transaksi", "antarmuka", "fitur screener", "layanan pelanggan"]
+                fitur_sentimen = {f: {"positive": 0, "negative": 0, "neutral": 0} for f in fitur}
+
+                # Hitung sentimen berdasarkan fitur
+                for _, row in df.iterrows():
+                    for f in fitur:
+                        if f in row['text_clean']:
+                            fitur_sentimen[f][row['sentiment']] += 1
+
+                # Tampilkan hasil analisis fitur
+                for f in fitur:
+                    st.write(f"Fitur: {f}")
+                    st.write(f"- Positif: {fitur_sentimen[f]['positive']}")
+                    st.write(f"- Negatif: {fitur_sentimen[f]['negative']}")
+                    st.write(f"- Netral: {fitur_sentimen[f]['neutral']}")
+
 
 
 
