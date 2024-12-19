@@ -363,6 +363,62 @@ def main():
 
                 except:
                     st.write('error')
+                    
+                st.write("====================================================================")
+                st.subheader("Analisis Perbandingan Tahun")
+
+                # Filter Data Berdasarkan Tahun
+                df['at'] = pd.to_datetime(df['at'])
+                df['year'] = df['at'].dt.year
+
+                # Statistik Awal Berdasarkan Tahun
+                year_options = [2022, 2023, 2024]
+                for year in year_options:
+                    yearly_data = df[df['year'] == year]
+                    st.write(f"Tahun {year}:")
+                    st.write(f"- Jumlah Ulasan: {len(yearly_data)}")
+                    st.write(f"- Rata-Rata Rating: {yearly_data['score'].mean():.2f}")
+                    sentiment_counts = yearly_data['sentiment'].value_counts()
+                    st.write(f"- Positif: {sentiment_counts.get('positive', 0)}")
+                    st.write(f"- Negatif: {sentiment_counts.get('negative', 0)}")
+                    st.write(f"- Netral: {sentiment_counts.get('neutral', 0)}")
+                    st.write(" ")
+
+                # Visualisasi Rata-Rata Rating per Tahun
+                avg_rating_per_year = df.groupby('year')['score'].mean()
+                st.write("Rata-Rata Rating per Tahun")
+                fig, ax = plt.subplots(figsize=(10, 5))
+                avg_rating_per_year.plot(kind='line', marker='o', ax=ax)
+                ax.set_title("Rata-Rata Rating per Tahun", fontsize=16)
+                ax.set_xlabel("Tahun")
+                ax.set_ylabel("Rata-Rata Rating")
+                ax.grid(True)
+                st.pyplot(fig)
+
+                # Distribusi Sentimen per Tahun
+                sentiment_distribution = df.groupby('year')['sentiment'].value_counts().unstack().fillna(0)
+                st.write("Distribusi Sentimen per Tahun")
+                fig, ax = plt.subplots(figsize=(10, 6))
+                sentiment_distribution.plot(kind='bar', stacked=True, colormap='viridis', ax=ax)
+                ax.set_title("Distribusi Sentimen per Tahun", fontsize=16)
+                ax.set_xlabel("Tahun")
+                ax.set_ylabel("Jumlah Ulasan")
+                st.pyplot(fig)
+
+                # Word Cloud untuk Kata-Kata Negatif Berdasarkan Tahun
+                st.write("Word Cloud untuk Kata-Kata Negatif Berdasarkan Tahun")
+                for year in year_options:
+                    negative_text = " ".join(df[(df['year'] == year) & (df['sentiment'] == 'negative')]['text_clean'].astype(str))
+                    if negative_text:
+                        wordcloud = WordCloud(stopwords=STOPWORDS, background_color='black', colormap='Reds', width=700, height=400).generate(negative_text)
+                        st.write(f"Word Cloud Ulasan Negatif Tahun {year}")
+                        fig, ax = plt.subplots(figsize=(10, 6))
+                        ax.imshow(wordcloud, interpolation="bilinear")
+                        ax.axis("off")
+                        st.pyplot(fig)
+                    else:
+                        st.write(f"Tidak ada ulasan negatif untuk tahun {year}.")
+
 
 
         except:
