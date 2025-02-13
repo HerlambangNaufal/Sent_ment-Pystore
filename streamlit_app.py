@@ -389,7 +389,7 @@ def main():
                 st.write("Rata-Rata Rating per Tahun")
                 fig, ax = plt.subplots(figsize=(10, 5))
                 avg_rating_per_year.plot(kind='line', marker='o', ax=ax)
-                ax.set_title("Rata-Rata Rating per Tahun", fontsize=16)
+                ax.set_title("Rata-Rata Skor Sentimen per Tahun", fontsize=16)
                 ax.set_xlabel("Tahun")
                 ax.set_ylabel("Rata-Rata Rating (1-5)")
                 ax.grid(True)
@@ -404,44 +404,6 @@ def main():
                 ax.set_xlabel("Tahun")
                 ax.set_ylabel("Jumlah Ulasan")
                 st.pyplot(fig)
-
-                # Word Cloud untuk Kata-Kata Negatif Berdasarkan Tahun
-                st.write("Word Cloud untuk Kata-Kata Negatif Berdasarkan Tahun")
-                for year in year_options:
-                    negative_text = " ".join(df[(df['year'] == year) & (df['sentiment'] == 'negative')]['text_clean'].astype(str))
-                    if negative_text:
-                        wordcloud = WordCloud(stopwords=STOPWORDS, background_color='black', colormap='Reds', width=700, height=400).generate(negative_text)
-                        st.write(f"Word Cloud Ulasan Negatif Tahun {year}")
-                        fig, ax = plt.subplots(figsize=(10, 6))
-                        ax.imshow(wordcloud, interpolation="bilinear")
-                        ax.axis("off")
-                        st.pyplot(fig)
-                    else:
-                        st.write(f"Tidak ada ulasan negatif untuk tahun {year}.")
-
-                # Aspect-Based Sentiment Analysis (Opsional)
-                st.write("====================================================================")
-                st.subheader("Analisis Sentimen Berdasarkan Fitur Aplikasi")
-                # Daftar fitur yang mungkin muncul di ulasan
-                fitur = ["transaksi", "antarmuka", "fitur screener", "layanan pelanggan"]
-                fitur_sentimen = {f: {"positive": 0, "negative": 0, "neutral": 0} for f in fitur}
-
-                # Hitung sentimen berdasarkan fitur
-                for _, row in df.iterrows():
-                    for f in fitur:
-                        if f in row['text_clean']:
-                            fitur_sentimen[f][row['sentiment']] += 1
-
-                # Tampilkan hasil analisis fitur
-                for f in fitur:
-                    st.write(f"Fitur: {f}")
-                    st.write(f"- Positif: {fitur_sentimen[f]['positive']}")
-                    st.write(f"- Negatif: {fitur_sentimen[f]['negative']}")
-                    st.write(f"- Netral: {fitur_sentimen[f]['neutral']}")
-
-
-
-
         except:
             st.write('Select The Correct File')
 
