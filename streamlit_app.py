@@ -73,6 +73,8 @@ def main():
                 df = df[['userName', 'score', 'at', 'content']]
                 df['at'] = pd.to_datetime(df['at'])
                 df = df[df['at'].dt.year.isin([2021, 2022, 2023, 2024])]
+                # Simpan rating asli sebelum proses sentimen lexicon
+                df['score_original'] = df['score']  # Simpan rating asli dari Google Play Store
     
                 # Display filtered data and provide download option
                 st.dataframe(df)
