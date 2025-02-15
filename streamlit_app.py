@@ -385,7 +385,20 @@ def main():
                     st.write(f"- Negatif: {sentiment_counts.get('negative', 0)}")
                     st.write(f"- Netral: {sentiment_counts.get('neutral', 0)}")
                     st.write(" ")
-
+                st.write("====================================================================")
+                st.subheader("Tren Rata-Rata Rating Google Play Store dari Tahun ke Tahun")
+                
+                # Hitung rata-rata rating asli per tahun
+                avg_rating_per_year = df.groupby('year')['score_original'].mean()
+                
+                # Visualisasi
+                fig, ax = plt.subplots(figsize=(10, 5))
+                avg_rating_per_year.plot(kind='line', marker='o', ax=ax, color='blue')
+                ax.set_title("Tren Rata-Rata Rating Google Play Store per Tahun", fontsize=16)
+                ax.set_xlabel("Tahun")
+                ax.set_ylabel("Rata-Rata Rating (1-5)")
+                ax.grid(True)
+                st.pyplot(fig)
                 # Visualisasi Rata-Rata Rating per Tahun
                 avg_rating_per_year = df.groupby('year')['score'].mean()
                 st.write("Rata-Rata Rating per Tahun")
