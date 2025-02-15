@@ -224,8 +224,6 @@ def main():
                     results = list(zip(*results))
                     df['score'] = results[0]
                     df['sentiment'] = results[1]
-                    # Simpan hasil sentimen lexicon dalam kolom baru
-                    df['score_sentiment'] = df['sentiment']  # Simpan hasil sentimen dari lexicon
                     st.text(df['sentiment'].value_counts())
 
                     st.dataframe(df)
