@@ -448,6 +448,32 @@ def main():
                     st.write(f"Jumlah data latih dengan sentimen positive: {jumlah_data_latih_positive}")
                     st.write(f"Jumlah data latih dengan sentimen negative: {jumlah_data_latih_negative}")
                     st.write(f"Jumlah data latih dengan sentimen neutral: {jumlah_data_latih_neutral}")
+                                    from sklearn.model_selection import cross_val_score, StratifiedKFold
+
+                    st.write("====================================================================")
+                    st.subheader("Evaluasi Model dengan Cross-Validation")
+    
+                    # Konversi text_clean ke fitur numerik menggunakan TF-IDF
+                    vectorizer = TfidfVectorizer()
+                    X = vectorizer.fit_transform(df['text_clean'])
+                    y = df['sentiment']
+    
+                    # Definisikan model SVM
+                    clfsvm = svm.SVC(kernel="linear")
+    
+                    # Gunakan 5-fold Cross-Validation
+                    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+                    accuracy = cross_val_score(clfsvm, X, y, cv=skf, scoring='accuracy')
+                    precision = cross_val_score(clfsvm, X, y, cv=skf, scoring='precision_macro')
+                    recall = cross_val_score(clfsvm, X, y, cv=skf, scoring='recall_macro')
+                    f1 = cross_val_score(clfsvm, X, y, cv=skf, scoring='f1_macro')
+    
+                    # Tampilkan hasil evaluasi
+                    st.write(f"Rata-rata Akurasi Model: {accuracy.mean():.2f}")
+                    st.write(f"Rata-rata Precision Model: {precision.mean():.2f}")
+                    st.write(f"Rata-rata Recall Model: {recall.mean():.2f}")
+                    st.write(f"Rata-rata F1-Score Model: {f1.mean():.2f}")
+
                     
                     # Jumlah data uji
                     st.write(f"Jumlah data uji: {len(X_test)}")
