@@ -448,9 +448,10 @@ def main():
                     st.write(f"Jumlah data latih dengan sentimen positive: {jumlah_data_latih_positive}")
                     st.write(f"Jumlah data latih dengan sentimen negative: {jumlah_data_latih_negative}")
                     st.write(f"Jumlah data latih dengan sentimen neutral: {jumlah_data_latih_neutral}")
-                                    from sklearn.model_selection import cross_val_score, StratifiedKFold
 
                     st.write("====================================================================")
+
+                    from sklearn.model_selection import cross_val_score, StratifiedKFold
                     st.subheader("Evaluasi Model dengan Cross-Validation")
     
                     # Konversi text_clean ke fitur numerik menggunakan TF-IDF
