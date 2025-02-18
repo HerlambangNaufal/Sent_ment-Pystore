@@ -233,6 +233,7 @@ def main():
             st.write('Select The Correct File')
 
     with tab3:
+        from collections import Counter
         try:
             data_file = st.file_uploader("Upload Labeled CSV file",type=["csv"])
             if data_file is not None:
@@ -374,7 +375,7 @@ def main():
                 df['year'] = df['at'].dt.year
 
                 # Statistik Awal Berdasarkan Tahun
-                year_options = [2022, 2023, 2024]
+                year_options = [2021,2022, 2023, 2024,2025]
                 for year in year_options:
                     yearly_data = df[df['year'] == year]
                     st.write(f"Tahun {year}:")
