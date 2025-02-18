@@ -19,6 +19,7 @@ from sklearn import svm
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import f1_score, recall_score, precision_score, confusion_matrix, accuracy_score, classification_report
+from collections import Counter
 
 def main():
 
@@ -233,7 +234,6 @@ def main():
             st.write('Select The Correct File')
 
     with tab3:
-        from collections import Counter
         try:
             data_file = st.file_uploader("Upload Labeled CSV file",type=["csv"])
             if data_file is not None:
