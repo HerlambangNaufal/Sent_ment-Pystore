@@ -105,16 +105,27 @@ def main():
 
                     # Cleaning Text
                     def cleansing(text):
-                        text = re.sub(r"\d+", "", text)  # Hapus angka
-                        text = text.encode('ascii', 'ignore').decode('ascii')  # Hapus non-ASCII
-                        text = re.sub(r'http\S+|www.\S+', '', text, flags=re.MULTILINE)  # Hapus URL
-                        text = re.sub(r'@\w+|#\w+', '', text)  # Hapus mention dan hashtag
-                        text = re.sub(r'[^a-zA-Z\s]', '', text)  # Hanya huruf & spasi
-                        text = re.sub(r'\b[a-zA-Z]\b', '', text)  # Hapus huruf tunggal
-                        text = re.sub(r'(.)\1+', r'\1\1', text)  # Reduksi huruf berulang
-                        text = re.sub(r'[\?\.\!]+(?=[\?.\!])', '', text)  # Hapus tanda baca berulang
-                        text = re.sub('\s+', ' ', text).strip()  # Hapus spasi berlebih
-                        return ' '.join(dict.fromkeys(text.split()))  # Hapus kata ganda
+                        #removing number
+                        text = re.sub(r"\d+","", text)
+                        # remove non ASCII (emoticon, chinese word, .etc)
+                        text = text.encode('ascii', 'replace').decode('ascii')
+                        # remove mention, link, hashtag
+                        text = ' '.join(re.sub("([@#][A-Za-z0-9]+)|(\w+:\/\/\S+)"," ", text).split())
+                        #Alphabeth only, exclude number and special character
+                        text = re.sub(r'[^a-zA-Z]', ' ', text)
+                        text = re.sub(r'\b[a-zA-Z]\b', ' ', text)
+                        # replace word repetition with a single occutance ('oooooooo' to 'o')
+                        text = re.sub(r'(.)\1+', r'\1\1', text)
+                        # replace punctations repetitions with a single occurance ('!!!!!!!' to '!')
+                        text = re.sub(r'[\?\.\!]+(?=[\?.\!])', '', text)
+                        #remove multiple whitespace into single whitespace
+                        text = re.sub('\s+',' ',text)
+                        #remove punctuation
+                        text = text.translate(text.maketrans("","",string.punctuation))
+                        # Remove double word
+                        text = text.strip()
+                        text = ' '.join(dict.fromkeys(text.split()))
+                        return text
 
                     # Case folding text
                     def casefolding(text):
@@ -133,17 +144,23 @@ def main():
                         if row[0] not in normalizad_word_dict:
                             normalizad_word_dict[row[0]] = row[1]
 
-                    def normalized_term(tokens):
-                        return [normalizad_word_dict.get(token, token) for token in tokens]
+                    def normalized_term(text):
+                        return [normalizad_word_dict[term] if term in normalizad_word_dict else term for term in text]
 
                     # Filltering | stopwords removal
-                    def stopword_removal(tokens):
-                        stop_words = set(stopwords.words('indonesian'))
-                        return [word for word in tokens if word not in stop_words]
+                    def stopword(text):
+                        listStopwords = set(stopwords.words('indonesian'))
+                        filtered = []
+                        for txt in text:
+                            if txt not in listStopwords:
+                                filtered.append(txt)
+                        text = filtered 
+                        return text
 
                     # Remove punctuation
-                    def remove_punct(tokens):
-                        return [word for word in tokens if word not in string.punctuation]
+                    def remove_punct(text):
+                        text = " ".join([char for char in text if char not in string.punctuation])
+                        return text
 
                     # Deploy Function
                     st.write("===========================================================")
@@ -187,10 +204,10 @@ def main():
                             lexicon[row[0]] = int(row[1])
 
                     # Function to determine sentiment polarity of tweets        
-                    def sentiment_analysis_lexicon_indonesia(tokens):
+                    def sentiment_analysis_lexicon_indonesia(text):
                         #for word in text:
                         score = 0
-                        for word in tokens:
+                        for word in text:
                             if (word in lexicon):
                                 score = score + lexicon[word]
 
@@ -207,7 +224,7 @@ def main():
                     results = list(zip(*results))
                     df['score'] = results[0]
                     df['sentiment'] = results[1]
-                    st.tokens(df['sentiment'].value_counts())
+                    st.text(df['sentiment'].value_counts())
 
                     st.dataframe(df)
                     st.download_button(label='Download CSV', data = df.to_csv(index=False, encoding='utf8'), file_name='Labeled_'+url+'.csv',on_click=callback)
