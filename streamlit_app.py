@@ -124,8 +124,8 @@ def main():
                         #remove punctuation
                         text = text.translate(text.maketrans("","",string.punctuation))
                         # Remove double word
-                        #text = text.strip()
-                        #text = ' '.join(dict.fromkeys(text.split()))
+                        text = text.strip()
+                        text = ' '.join(dict.fromkeys(text.split()))
                         return text
 
                     # Case folding text
