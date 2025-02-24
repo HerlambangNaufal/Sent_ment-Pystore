@@ -234,80 +234,66 @@ def main():
             st.write('Select The Correct File')
 
     with tab3:
-        try:import streamlit as st
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.model_selection import train_test_split
-from sklearn.svm import SVC
-from sklearn.metrics import classification_report, confusion_matrix
-
-# Streamlit App
-st.title("Visualisasi Hasil Klasifikasi Sentimen dengan SVM")
-
-with st.tab("Tab 3"):
-    try:
-        data_file = st.file_uploader("Upload CSV file dengan label sentimen", type=["csv"])
-        if data_file is not None:
-            df = pd.read_csv(data_file)
-            st.write("Data Preview:")
-            st.dataframe(df.head())
+        try:
+            data_file = st.file_uploader("Upload CSV file dengan label sentimen", type=["csv"])
+            if data_file is not None:
+                df = pd.read_csv(data_file)
+                st.write("Data Preview:")
+                st.dataframe(df.head())
+                
+                # Pastikan kolom yang dibutuhkan ada
+                if 'text_clean' in df.columns and 'sentiment' in df.columns:
+                    
+                    # Mapping label sentimen ke angka
+                    sentiment_mapping = {'positive': 1, 'negative': -1, 'neutral': 0}
+                    df['sentiment_label'] = df['sentiment'].map(sentiment_mapping)
+                    
+                    # TF-IDF Vectorization
+                    vectorizer = TfidfVectorizer(max_features=5000)
+                    X = vectorizer.fit_transform(df['text_clean'])
+                    y = df['sentiment_label']
+                    
+                    # Split Data
+                    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+                    
+                    # Train SVM Model
+                    model = SVC(kernel='linear', probability=True)
+                    model.fit(X_train, y_train)
+                    
+                    # Predict
+                    y_pred = model.predict(X_test)
+                    
+                    # Classification Report
+                    st.subheader("Classification Report")
+                    st.text(classification_report(y_test, y_pred))
+                    
+                    # Confusion Matrix
+                    cm = confusion_matrix(y_test, y_pred)
+                    labels = ['Negative', 'Neutral', 'Positive']
+                    
+                    fig, ax = plt.subplots(figsize=(6, 5))
+                    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=labels, yticklabels=labels)
+                    plt.xlabel("Predicted")
+                    plt.ylabel("Actual")
+                    plt.title("Confusion Matrix")
+                    st.pyplot(fig)
+                    
+                    # Distribusi Prediksi Sentimen
+                    pred_counts = pd.Series(y_pred).map({-1: 'Negative', 0: 'Neutral', 1: 'Positive'}).value_counts()
+                    fig, ax = plt.subplots(figsize=(6, 4))
+                    pred_counts.plot(kind='bar', color=['red', 'gray', 'blue'])
+                    plt.title("Distribusi Sentimen Prediksi")
+                    plt.xlabel("Sentiment")
+                    plt.ylabel("Jumlah Ulasan")
+                    st.pyplot(fig)
+                    
+                    st.success("Model SVM berhasil dilatih dan divisualisasikan!")
+                else:
+                    st.error("Kolom 'text_clean' dan 'sentiment' tidak ditemukan dalam dataset.")
+        except Exception as e:
+            st.error(f"Terjadi kesalahan: {e}")
+    
             
-            # Pastikan kolom yang dibutuhkan ada
-            if 'text_clean' in df.columns and 'sentiment' in df.columns:
-                
-                # Mapping label sentimen ke angka
-                sentiment_mapping = {'positive': 1, 'negative': -1, 'neutral': 0}
-                df['sentiment_label'] = df['sentiment'].map(sentiment_mapping)
-                
-                # TF-IDF Vectorization
-                vectorizer = TfidfVectorizer(max_features=5000)
-                X = vectorizer.fit_transform(df['text_clean'])
-                y = df['sentiment_label']
-                
-                # Split Data
-                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-                
-                # Train SVM Model
-                model = SVC(kernel='linear', probability=True)
-                model.fit(X_train, y_train)
-                
-                # Predict
-                y_pred = model.predict(X_test)
-                
-                # Classification Report
-                st.subheader("Classification Report")
-                st.text(classification_report(y_test, y_pred))
-                
-                # Confusion Matrix
-                cm = confusion_matrix(y_test, y_pred)
-                labels = ['Negative', 'Neutral', 'Positive']
-                
-                fig, ax = plt.subplots(figsize=(6, 5))
-                sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=labels, yticklabels=labels)
-                plt.xlabel("Predicted")
-                plt.ylabel("Actual")
-                plt.title("Confusion Matrix")
-                st.pyplot(fig)
-                
-                # Distribusi Prediksi Sentimen
-                pred_counts = pd.Series(y_pred).map({-1: 'Negative', 0: 'Neutral', 1: 'Positive'}).value_counts()
-                fig, ax = plt.subplots(figsize=(6, 4))
-                pred_counts.plot(kind='bar', color=['red', 'gray', 'blue'])
-                plt.title("Distribusi Sentimen Prediksi")
-                plt.xlabel("Sentiment")
-                plt.ylabel("Jumlah Ulasan")
-                st.pyplot(fig)
-                
-                st.success("Model SVM berhasil dilatih dan divisualisasikan!")
-            else:
-                st.error("Kolom 'text_clean' dan 'sentiment' tidak ditemukan dalam dataset.")
-    except Exception as e:
-        st.error(f"Terjadi kesalahan: {e}")
-
-        
     with tab4:
         try:
             import seaborn as sns
