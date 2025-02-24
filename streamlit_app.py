@@ -235,6 +235,12 @@ def main():
 
     with tab3:
         try:
+            import seaborn as sns
+            from sklearn.feature_extraction.text import TfidfVectorizer
+            from sklearn.model_selection import train_test_split
+            from sklearn.svm import SVC
+            from sklearn.metrics import classification_report, confusion_matrix
+
             data_file = st.file_uploader("Upload CSV file dengan label sentimen", type=["csv"])
             if data_file is not None:
                 df = pd.read_csv(data_file)
