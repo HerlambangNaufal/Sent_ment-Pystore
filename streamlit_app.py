@@ -235,55 +235,193 @@ def main():
 
     with tab3:
         try:
-            import seaborn as sns
-            from sklearn.feature_extraction.text import TfidfVectorizer
-            from sklearn.model_selection import train_test_split
-            from sklearn.svm import SVC
-            from sklearn.metrics import classification_report, confusion_matrix
-
-            data_file = st.file_uploader("Upload CSV file dengan label sentimen", type=["csv"])
+            data_file = st.file_uploader("Upload Labeled CSV file",type=["csv"])
             if data_file is not None:
                 df = pd.read_csv(data_file)
-                st.write("Data Preview:")
-                st.dataframe(df.head())
-                
-                # Pastikan kolom yang dibutuhkan ada
-                if 'text_clean' in df.columns and 'sentiment' in df.columns:
-                    
-                    # Mapping label sentimen ke angka
-                    sentiment_mapping = {'positive': 1, 'negative': -1, 'neutral': 0}
-                    df['sentiment_label'] = df['sentiment'].map(sentiment_mapping)
-                    
-                    # TF-IDF Vectorization
-                    vectorizer = TfidfVectorizer(max_features=5000)
-                    X = vectorizer.fit_transform(df['text_clean'])
-                    y = df['sentiment_label']
-                    
-                    # Split Data
-                    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-                    
-                    # Train SVM Model
-                    model = SVC(kernel='linear', probability=True)
-                    model.fit(X_train, y_train)
-                    
-                    # Predict
-                    y_pred = model.predict(X_test)
-                    
-                    # Distribusi Prediksi Sentimen
-                    pred_counts = pd.Series(y_pred).map({-1: 'Negative', 0: 'Neutral', 1: 'Positive'}).value_counts()
-                    fig, ax = plt.subplots(figsize=(6, 4))
-                    pred_counts.plot(kind='bar', color=['red', 'gray', 'blue'])
-                    plt.title("Distribusi Sentimen Prediksi")
-                    plt.xlabel("Sentiment")
-                    plt.ylabel("Jumlah Ulasan")
-                    st.pyplot(fig)
-                    
-                    st.success("Model SVM berhasil dilatih dan divisualisasikan!")
+                st.dataframe(df)
+
+                positif = len(df[df['sentiment'] == "positive"])
+                negatif = len(df[df['sentiment'] == "negative"])
+                netral = len(df[df['sentiment'] == "neutral"])
+
+                docPositive = df[df['sentiment']=='positive'].reset_index(drop=True)
+                docNegative = df[df['sentiment']=='negative'].reset_index(drop=True)
+                docNeutral = df[df['sentiment']=='neutral'].reset_index(drop=True)
+
+                option = st.radio('ingin lihat data apa? ',['Positive','Negative','Neutral'])
+                if option == 'Positive':
+                    st.write("========================================================================================")
+                    st.write('Document Positive Sentiment')
+                    st.caption(f"Positive = {positif}, {docPositive.shape[0]/df.shape[0]*100} % ")
+                    st.dataframe(docPositive)
+                elif option == 'Negative':
+                    st.write("========================================================================================")
+                    st.write('Document Negative Sentiment')
+                    st.caption(f"Negative = {negatif}, {docNegative.shape[0]/df.shape[0]*100} % ")
+                    st.dataframe(docNegative)
                 else:
-                    st.error("Kolom 'text_clean' dan 'sentiment' tidak ditemukan dalam dataset.")
-        except Exception as e:
-            st.error(f"Terjadi kesalahan: {e}")
-    
+                    st.write("========================================================================================")
+                    st.write('Document Neutral Sentiment')
+                    st.caption(f"Neutral = {netral}, {docNeutral.shape[0]/df.shape[0]*100} % ")
+                    st.dataframe(docNeutral)
+
+                st.write("========================================================================================")
+                try:
+                    text = " ".join(df['text_clean'])
+                    wordcloud = WordCloud(width = 600, height = 400, background_color = 'black', min_font_size = 10).generate(text)
+                    fig, ax = plt.subplots(figsize = (8, 6))
+                    ax.set_title('WordCloud of Comment Data', fontsize = 18)
+                    ax.grid(False)
+                    ax.imshow((wordcloud))
+                    fig.tight_layout(pad=0)
+                    ax.axis('off')
+                    st.pyplot(fig)
+                except:
+                    st.write(' ')
+
+                try:
+                    st.write('WordCloud Positive')
+                    train_s0 = df[df["sentiment"] == 'positive']
+                    text = " ".join((word for word in train_s0["text_clean"]))
+                    wordcloud = WordCloud(stopwords=STOPWORDS, background_color='black', width=700, height=400,colormap='Blues', mode='RGBA').generate(text)
+                    fig, ax = plt.subplots(1,figsize=(13, 13))
+                    ax.set_title('WordCloud Positive', fontsize = 18)
+                    ax.imshow(wordcloud, interpolation = 'bilinear')
+                    plt.axis('off')
+                    st.pyplot(fig)
+                except:
+                    st.write('tidak ada sentiment positif pada data')
+
+                try:
+                    st.write('WordCloud Negative')
+                    train_s0 = df[df["sentiment"] == 'negative']
+                    text = " ".join((word for word in train_s0["text_clean"]))
+                    wordcloud = WordCloud(stopwords=STOPWORDS, background_color='black', width=700, height=400,colormap='Reds', mode='RGBA').generate(text)
+                    fig, ax = plt.subplots(1,figsize=(13, 13))
+                    ax.set_title('WordCloud Negative', fontsize = 18)
+                    ax.imshow(wordcloud, interpolation = 'bilinear')
+                    plt.axis('off')
+                    st.pyplot(fig)
+                except:
+                    st.write('tidak ada sentiment negatif pada data')
+                try:
+                    st.write('WordCloud Neutral')
+                    train_s0 = df[df["sentiment"] == 'neutral']
+                    text = " ".join((word for word in train_s0["text_clean"]))
+                    wordcloud = WordCloud(stopwords=STOPWORDS, background_color='black', width=700, height=400,colormap='Greens', mode='RGBA').generate(text)
+                    fig, ax = plt.subplots(1,figsize=(13, 13))
+                    ax.set_title('WordCloud Neutral', fontsize = 18)
+                    ax.imshow(wordcloud, interpolation = 'bilinear')
+                    plt.axis('off')
+                    st.pyplot(fig)
+                except:
+                    st.write('tidak ada sentiment neutral pada data')
+
+                try:
+                    st.write('Pie Chart')
+                    def pie_chart(label, data, legend_title):
+                        fig, ax = plt.subplots(figsize=(5,7), subplot_kw=dict(aspect='equal'))
+
+                        labels = [x.split()[-1] for x in label]
+
+                        def func(pct, allvals):
+                            absolute = int(np.round(pct/100.*np.sum(allvals)))
+                            return "{:.1f}% ({:d})".format(pct, absolute)
+
+                        wedges, texts, autotexts = ax.pie(data, autopct = lambda pct: func(pct, data),
+                            textprops = dict(color="w"))
+
+                        ax.legend(wedges, labels, title = legend_title,
+                    loc = "center left",
+                    bbox_to_anchor=(1,0,0.25,1))
+                        plt.setp(autotexts, size=6, weight="bold")
+                        st.pyplot(fig)
+
+                    label = ['Positif', 'Negatif','Neutral']
+                    count_data =[positif, negatif, netral]
+
+                    pie_chart(label, count_data, "status")
+                except:
+                    st.caption('')
+                st.spinner(text="In progress...")
+
+                try:
+                    st.write('Word Frequency')
+                    top = 11
+                    a = df['text_clean'].str.cat(sep=' ')
+                    words = nltk.tokenize.word_tokenize(a)
+                    Word_dist = nltk.FreqDist(words)
+                    rslt = pd.DataFrame(Word_dist.most_common(top), columns=['Word', 'Frequency'])
+
+                    count = rslt['Frequency']
+
+                    fig, x = plt.subplots(1,1,figsize=(11,8))
+                    # create bar plot
+                    plt.bar(rslt['Word'], count, color=['royalblue'])
+
+                    plt.xlabel('\nKata', size=14)
+                    plt.ylabel('\nFrekuensi Kata', size=14)
+                    plt.title('Kata yang sering Keluar \n', size=16)
+                    st.pyplot(fig)
+
+                except:
+                    st.write('error')
+                    
+                st.write("====================================================================")
+                st.subheader("Analisis Perbandingan Tahun dan Alasan Penurunan")
+
+                # Filter Data Berdasarkan Tahun
+                df['at'] = pd.to_datetime(df['at'])
+                df['year'] = df['at'].dt.year
+
+                # Statistik Awal Berdasarkan Tahun
+                year_options = [2021,2022, 2023, 2024,2025]
+                for year in year_options:
+                    yearly_data = df[df['year'] == year]
+                    st.write(f"Tahun {year}:")
+                    st.write(f"- Jumlah Ulasan: {len(yearly_data)}")
+                    st.write(f"- Rata-Rata Rating: {yearly_data['score'].mean():.2f}")
+                    sentiment_counts = yearly_data['sentiment'].value_counts()
+                    st.write(f"- Positif: {sentiment_counts.get('positive', 0)}")
+                    st.write(f"- Negatif: {sentiment_counts.get('negative', 0)}")
+                    st.write(f"- Netral: {sentiment_counts.get('neutral', 0)}")
+                    st.write(" ")
+                st.write("====================================================================")
+                st.subheader("Tren Rata-Rata Rating Google Play Store dari Tahun ke Tahun")
+                
+                # Hitung rata-rata rating asli per tahun
+                avg_rating_per_year = df.groupby('year')['score_original'].mean()
+                
+                # Visualisasi
+                fig, ax = plt.subplots(figsize=(10, 5))
+                avg_rating_per_year.plot(kind='line', marker='o', ax=ax, color='blue')
+                ax.set_title("Tren Rata-Rata Rating Google Play Store per Tahun", fontsize=16)
+                ax.set_xlabel("Tahun")
+                ax.set_ylabel("Rata-Rata Rating (1-5)")
+                ax.grid(True)
+                st.pyplot(fig)
+                # Visualisasi Rata-Rata Rating per Tahun
+                avg_rating_per_year = df.groupby('year')['score'].mean()
+                st.write("Rata-Rata Rating per Tahun")
+                fig, ax = plt.subplots(figsize=(10, 5))
+                avg_rating_per_year.plot(kind='line', marker='o', ax=ax)
+                ax.set_title("Rata-Rata Skor Sentimen per Tahun", fontsize=16)
+                ax.set_xlabel("Tahun")
+                ax.set_ylabel("Rata-Rata Rating (1-5)")
+                ax.grid(True)
+                st.pyplot(fig)
+
+                # Distribusi Sentimen per Tahun
+                sentiment_distribution = df.groupby('year')['sentiment'].value_counts().unstack().fillna(0)
+                st.write("Distribusi Sentimen per Tahun")
+                fig, ax = plt.subplots(figsize=(10, 6))
+                sentiment_distribution.plot(kind='bar', stacked=True, colormap='viridis', ax=ax)
+                ax.set_title("Distribusi Sentimen per Tahun", fontsize=16)
+                ax.set_xlabel("Tahun")
+                ax.set_ylabel("Jumlah Ulasan")
+                st.pyplot(fig)
+        except:
+            st.write('Select The Correct File')
             
     with tab4:
         try:
