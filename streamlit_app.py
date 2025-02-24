@@ -263,21 +263,6 @@ def main():
                     # Predict
                     y_pred = model.predict(X_test)
                     
-                    # Classification Report
-                    st.subheader("Classification Report")
-                    st.text(classification_report(y_test, y_pred))
-                    
-                    # Confusion Matrix
-                    cm = confusion_matrix(y_test, y_pred)
-                    labels = ['Negative', 'Neutral', 'Positive']
-                    
-                    fig, ax = plt.subplots(figsize=(6, 5))
-                    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=labels, yticklabels=labels)
-                    plt.xlabel("Predicted")
-                    plt.ylabel("Actual")
-                    plt.title("Confusion Matrix")
-                    st.pyplot(fig)
-                    
                     # Distribusi Prediksi Sentimen
                     pred_counts = pd.Series(y_pred).map({-1: 'Negative', 0: 'Neutral', 1: 'Positive'}).value_counts()
                     fig, ax = plt.subplots(figsize=(6, 4))
