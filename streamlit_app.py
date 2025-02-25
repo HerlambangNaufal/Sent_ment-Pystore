@@ -410,6 +410,7 @@ def main():
                 ax.set_ylabel("Rata-Rata Rating (1-5)")
                 ax.grid(True)
                 st.pyplot(fig)
+                print(df['year'].unique())
 
                 # Hitung jumlah ulasan per tahun
                  # Pastikan kolom 'at' dalam format datetime
