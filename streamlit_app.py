@@ -228,7 +228,6 @@ def main():
                     st.write("Sentiment Analysis Result:")
                     st.dataframe(df[['content', 'sentiment', 'score']])
                     st.download_button(label='Download CSV', data=df.to_csv(index=False), file_name='labeled_data.csv')
-                    st.download_button(label='Download CSV', data=df.to_csv(index=False, encoding='utf8'), file_name='Labeled_Output.csv', on_click=callback)
         except:
             st.write('Select The Correct File')
 
