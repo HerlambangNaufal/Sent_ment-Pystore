@@ -221,8 +221,10 @@ def main():
                     st.write("Count Polarity and Labeling...")
                     st.caption("using indonesia sentiment lexicon")
 
-                    results = df['text_clean'].apply(lambda x: sentiment_analysis_lexicon_indonesia(x, pos_lex, neg_lex))
+                    st.write("🔍 Running Sentiment Analysis on Processed Text...")
+                    results = df['text_stopword'].apply(lambda x: sentiment_analysis_lexicon_indonesia(x, pos_lex, neg_lex))
                     df['score'], df['sentiment'] = zip(*results)
+                    st.write("✅ Sentiment Analysis Completed!")
                     df['score'] = results[0]
                     df['sentiment'] = results[1]
                     st.text(df['sentiment'].value_counts())
