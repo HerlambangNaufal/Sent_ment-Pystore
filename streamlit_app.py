@@ -138,29 +138,19 @@ def main():
                     # Load lexicon once
                     pos_lex, neg_lex = load_lexicon()
                     # Cleaning Text
-                    def cleansing(text):
-                        #removing number
-                        text = re.sub(r"\d+","", text)
-                        # remove non ASCII (emoticon, chinese word, .etc)
+                     def cleansing(text):
+                        text = re.sub(r"\d+", "", text)
                         text = text.encode('ascii', 'replace').decode('ascii')
-                        # remove mention, link, hashtag
-                        text = ' '.join(re.sub("([@#][A-Za-z0-9]+)|(\w+:\/\/\S+)"," ", text).split())
-                        #Alphabeth only, exclude number and special character
+                        text = ' '.join(re.sub("([@#][A-Za-z0-9]+)|(\\w+:\/\/\\S+)", " ", text).split())
                         text = re.sub(r'[^a-zA-Z]', ' ', text)
                         text = re.sub(r'\b[a-zA-Z]\b', ' ', text)
-                        # replace word repetition with a single occutance ('oooooooo' to 'o')
                         text = re.sub(r'(.)\1+', r'\1\1', text)
-                        # replace punctations repetitions with a single occurance ('!!!!!!!' to '!')
                         text = re.sub(r'[\?\.\!]+(?=[\?.\!])', '', text)
-                        #remove multiple whitespace into single whitespace
-                        text = re.sub('\s+',' ',text)
-                        #remove punctuation
-                        text = text.translate(text.maketrans("","",string.punctuation))
-                        # Remove double word
-                        #text = text.strip()
-                        #text = ' '.join(dict.fromkeys(text.split()))
-                        return text
-
+                        text = re.sub('\s+', ' ', text)
+                        text = text.translate(str.maketrans("", "", string.punctuation))
+                        text = text.strip()
+                        text = ' '.join(dict.fromkeys(text.split()))
+                        return text.lower()
                     # Case folding text
                     def casefolding(text):
                         text = text.lower()
@@ -201,7 +191,7 @@ def main():
                     st.write("Start Pre-processing")
 
                     st.caption("| cleaning...")
-                    df['cleansing'] = df['content'].apply(cleansing)
+                    df['clean_text'] = df['content'].astype(str).apply(cleansing)
 
                     st.caption("| case folding...")
                     df['case_folding'] = df['cleansing'].apply(casefolding)
@@ -231,7 +221,7 @@ def main():
                     st.write("Count Polarity and Labeling...")
                     st.caption("using indonesia sentiment lexicon")
 
-                    results = df['text_stopword'].apply(lambda x: sentiment_analysis_lexicon_indonesia(x, pos_lex, neg_lex))
+                    results = df['text_clean'].apply(lambda x: sentiment_analysis_lexicon_indonesia(x, pos_lex, neg_lex))
                     df['score'], df['sentiment'] = zip(*results)
                     df['score'] = results[0]
                     df['sentiment'] = results[1]
