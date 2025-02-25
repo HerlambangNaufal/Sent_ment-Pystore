@@ -399,7 +399,39 @@ def main():
                 ax.set_ylabel("Rata-Rata Rating (1-5)")
                 ax.grid(True)
                 st.pyplot(fig)
-                
+                #Debug COntoh
+                if 'at' in df.columns:
+                # Konversi kolom 'at' menjadi format datetime
+                df['at'] = pd.to_datetime(df['at'], errors='coerce')
+        
+                # Periksa apakah ada nilai NaT
+                if df['at'].isna().sum() > 0:
+                    st.warning(f"Ada {df['at'].isna().sum()} nilai NaT di kolom 'at'. Pastikan format tanggal benar.")
+        
+                # Buat kolom tahun
+                df['year'] = df['at'].dt.year
+        
+                # Hitung jumlah ulasan per tahun
+                review_counts = df['year'].value_counts().sort_index()
+        
+                # Tampilkan tabel jumlah ulasan per tahun
+                st.write("Jumlah Ulasan per Tahun:")
+                st.dataframe(review_counts.to_frame(name="Jumlah Ulasan"))
+        
+                # Visualisasi dengan bar chart
+                if not review_counts.empty:
+                    fig, ax = plt.subplots(figsize=(8, 5))
+                    review_counts.plot(kind='bar', color='royalblue', ax=ax)
+                    ax.set_title("Total Jumlah Ulasan per Tahun", fontsize=14)
+                    ax.set_xlabel("Tahun", fontsize=12)
+                    ax.set_ylabel("Jumlah Ulasan", fontsize=12)
+                    ax.grid(axis="y", linestyle="--", alpha=0.7)
+                    st.pyplot(fig)
+                else:
+                    st.error("Data jumlah ulasan per tahun kosong. Periksa kembali format tanggal di dataset.")
+        
+            else:
+                st.error("Kolom 'at' tidak ditemukan dalam dataset. Pastikan dataset memiliki kolom tanggal ulasan.")
                 # Visualisasi Rata-Rata Rating per Tahun
                 avg_rating_per_year = df.groupby('year')['score'].mean()
                 st.write("Rata-Rata Rating per Tahun")
