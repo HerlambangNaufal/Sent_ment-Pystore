@@ -368,7 +368,6 @@ def main():
                     st.write('error')
                     
                 st.write("====================================================================")
-                st.subheader("Analisis Perbandingan Tahun dan Alasan Penurunan")
 
                 # Filter Data Berdasarkan Tahun
                 df['at'] = pd.to_datetime(df['at'])
@@ -417,6 +416,7 @@ def main():
                 df['at'] = pd.to_datetime(df['at'])
             
                 # Ambil tahun dari tanggal ulasan
+                df['at'] = pd.to_datetime(df['at'], errors='coerce')
                 df['year'] = df['at'].dt.year
                 review_counts = df['year'].value_counts().sort_index()
                 # Visualisasi dengan bar chart
