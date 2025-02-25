@@ -368,6 +368,7 @@ def main():
                     st.write('error')
                     
                 st.write("====================================================================")
+                st.subheader("Analisis Perbandingan Tahun dan Alasan Penurunan")
 
                 # Filter Data Berdasarkan Tahun
                 df['at'] = pd.to_datetime(df['at'])
@@ -388,6 +389,18 @@ def main():
                 st.write("====================================================================")
                 st.subheader("Tren Rata-Rata Rating Google Play Store dari Tahun ke Tahun")
                 
+                # Hitung rata-rata rating asli per tahun
+                avg_rating_per_year = df.groupby('year')['score_original'].mean()
+                
+                # Visualisasi
+                fig, ax = plt.subplots(figsize=(10, 5))
+                avg_rating_per_year.plot(kind='line', marker='o', ax=ax, color='blue')
+                ax.set_title("Tren Rata-Rata Rating Google Play Store per Tahun", fontsize=16)
+                ax.set_xlabel("Tahun")
+                ax.set_ylabel("Rata-Rata Rating (1-5)")
+                ax.grid(True)
+                st.pyplot(fig)
+                # Visualisasi Rata-Rata Rating per Tahun
                 avg_rating_per_year = df.groupby('year')['score'].mean()
                 st.write("Rata-Rata Rating per Tahun")
                 fig, ax = plt.subplots(figsize=(10, 5))
@@ -397,24 +410,6 @@ def main():
                 ax.set_ylabel("Rata-Rata Rating (1-5)")
                 ax.grid(True)
                 st.pyplot(fig)
-                print(df['year'].unique())
-
-                # Hitung jumlah ulasan per tahun
-                 # Pastikan kolom 'at' dalam format datetime
-                df['at'] = pd.to_datetime(df['at'])
-            
-                # Ambil tahun dari tanggal ulasan
-                df['at'] = pd.to_datetime(df['at'], errors='coerce')
-                df['year'] = df['at'].dt.year
-                review_counts = df['year'].value_counts().sort_index()
-                # Visualisasi dengan bar chart
-                fig, ax = plt.subplots(figsize=(8, 5))
-                review_counts.plot(kind='bar', color='royalblue', ax=ax)
-                ax.set_title("Total Jumlah Ulasan per Tahun", fontsize=14)
-                ax.set_xlabel("Tahun", fontsize=12)
-                ax.set_ylabel("Jumlah Ulasan", fontsize=12)
-                ax.grid(axis="y", linestyle="--", alpha=0.7)
-
 
                 # Distribusi Sentimen per Tahun
                 sentiment_distribution = df.groupby('year')['sentiment'].value_counts().unstack().fillna(0)
