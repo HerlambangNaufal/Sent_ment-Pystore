@@ -105,30 +105,30 @@ def main():
                 if proses or st.session_state.prosess:
                     st.session_state.prosess = True
                 
-                def load_lexicon():
-                    pos_lex = set(pd.read_csv("positive.tsv", sep="\t", header=None)[0])
-                    neg_lex = set(pd.read_csv("negative.tsv", sep="\t", header=None)[0])
-                    return pos_lex, neg_lex
-                
-                def sentiment_analysis_lexicon_indonesia(text, pos_lex, neg_lex):
-                    score = 0
-                    for word in text:
-                        if word in pos_lex:
-                            score += 1
-                        elif word in neg_lex:
-                            score -= 1
+                    def load_lexicon():
+                        pos_lex = set(pd.read_csv("positive.tsv", sep="\t", header=None)[0])
+                        neg_lex = set(pd.read_csv("negative.tsv", sep="\t", header=None)[0])
+                        return pos_lex, neg_lex
                     
-                    if score > 0:
-                        polarity = 'positive'
-                    elif score == 0:
-                        polarity = 'neutral'
-                    else:
-                        polarity = 'negative'
+                    def sentiment_analysis_lexicon_indonesia(text, pos_lex, neg_lex):
+                        score = 0
+                        for word in text:
+                            if word in pos_lex:
+                                score += 1
+                            elif word in neg_lex:
+                                score -= 1
+                        
+                        if score > 0:
+                            polarity = 'positive'
+                        elif score == 0:
+                            polarity = 'neutral'
+                        else:
+                            polarity = 'negative'
+                        
+                        return score, polarity
                     
-                    return score, polarity
-                
-                # Load lexicon once
-                pos_lex, neg_lex = load_lexicon()
+                    # Load lexicon once
+                    pos_lex, neg_lex = load_lexicon()
                     # Cleaning Text
                     def cleansing(text):
                         #removing number
