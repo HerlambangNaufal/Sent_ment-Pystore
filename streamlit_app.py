@@ -194,7 +194,7 @@ def main():
                     df['clean_text'] = df['content'].astype(str).apply(cleansing)
 
                     st.caption("| case folding...")
-                    df['case_folding'] = df['cleansing'].apply(casefolding)
+                    df['case_folding'] = df['clean_text'].apply(casefolding)
                     
                     st.caption("| tokenizing...")
                     df['text_tokenize'] = df['case_folding'].apply(tokenize)
