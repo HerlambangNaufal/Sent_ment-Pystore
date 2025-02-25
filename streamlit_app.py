@@ -400,6 +400,7 @@ def main():
                 ax.set_ylabel("Rata-Rata Rating (1-5)")
                 ax.grid(True)
                 st.pyplot(fig)
+                
                 # Visualisasi Rata-Rata Rating per Tahun
                 avg_rating_per_year = df.groupby('year')['score'].mean()
                 st.write("Rata-Rata Rating per Tahun")
@@ -410,6 +411,18 @@ def main():
                 ax.set_ylabel("Rata-Rata Rating (1-5)")
                 ax.grid(True)
                 st.pyplot(fig)
+
+                 # Hitung jumlah ulasan per tahun
+                review_counts = df['year'].value_counts().sort_index()
+            
+                # Visualisasi dengan bar chart
+                fig, ax = plt.subplots(figsize=(8, 5))
+                review_counts.plot(kind='bar', color='royalblue', ax=ax)
+                ax.set_title("Total Jumlah Ulasan per Tahun", fontsize=14)
+                ax.set_xlabel("Tahun", fontsize=12)
+                ax.set_ylabel("Jumlah Ulasan", fontsize=12)
+                ax.grid(axis="y", linestyle="--", alpha=0.7)
+
 
                 # Distribusi Sentimen per Tahun
                 sentiment_distribution = df.groupby('year')['sentiment'].value_counts().unstack().fillna(0)
