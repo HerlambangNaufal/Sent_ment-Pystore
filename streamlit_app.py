@@ -88,6 +88,31 @@ def main():
     # Pre-Processing & Labeling
     with tab2:
         try:
+            def load_lexicon():
+                pos_lex = set(pd.read_csv("positive.tsv", sep="\t", header=None)[0])
+                neg_lex = set(pd.read_csv("negative.tsv", sep="\t", header=None)[0])
+                return pos_lex, neg_lex
+            
+            def sentiment_analysis_lexicon_indonesia(text, pos_lex, neg_lex):
+                score = 0
+                for word in text:
+                    if word in pos_lex:
+                        score += 1
+                    elif word in neg_lex:
+                        score -= 1
+                
+                if score > 0:
+                    polarity = 'positive'
+                elif score == 0:
+                    polarity = 'neutral'
+                else:
+                    polarity = 'negative'
+                
+                return score, polarity
+            
+            # Load lexicon once
+            pos_lex, neg_lex = load_lexicon()
+        
             data_file = st.file_uploader("Upload CSV file",type=["csv"])            
             if data_file is not None :
                 df = pd.read_csv(data_file)
@@ -103,7 +128,8 @@ def main():
 
                 if proses or st.session_state.prosess:
                     st.session_state.prosess = True
-
+                
+                
                     # Cleaning Text
                     def cleansing(text):
                         #removing number
@@ -197,32 +223,9 @@ def main():
                     # Determine sentiment polarity of doc using indonesia sentiment lexicon
                     st.write("Count Polarity and Labeling...")
                     st.caption("using indonesia sentiment lexicon")
-                    lexicon = dict()
-                    import csv
-                    with open('InSet_Lexicon.csv', 'r') as csvfile:
-                        reader = csv.reader(csvfile, delimiter=',')
-                        for row in reader:
-                            lexicon[row[0]] = int(row[1])
 
-                    # Function to determine sentiment polarity of tweets        
-                    def sentiment_analysis_lexicon_indonesia(text):
-                        #for word in text:
-                        score = 0
-                        for word in text:
-                            if (word in lexicon):
-                                score = score + lexicon[word]
-
-                        polarity=''
-                        if (score > 0):
-                            polarity = 'positive'
-                        elif (score == 0):
-                            polarity = 'neutral'
-                        else:
-                            polarity = 'negative'
-                        return score, polarity
-
-                    results = df['text_stopword'].apply(sentiment_analysis_lexicon_indonesia)
-                    results = list(zip(*results))
+                    results = df['text_stopword'].apply(lambda x: sentiment_analysis_lexicon_indonesia(x, pos_lex, neg_lex))
+                    df['score'], df['sentiment'] = zip(*results)
                     df['score'] = results[0]
                     df['sentiment'] = results[1]
                     st.text(df['sentiment'].value_counts())
