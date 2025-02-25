@@ -412,9 +412,13 @@ def main():
                 ax.grid(True)
                 st.pyplot(fig)
 
-                 # Hitung jumlah ulasan per tahun
-                review_counts = df['year'].value_counts().sort_index()
+                # Hitung jumlah ulasan per tahun
+                 # Pastikan kolom 'at' dalam format datetime
+                df['at'] = pd.to_datetime(df['at'])
             
+                # Ambil tahun dari tanggal ulasan
+                df['year'] = df['at'].dt.year
+                review_counts = df['year'].value_counts().sort_index()
                 # Visualisasi dengan bar chart
                 fig, ax = plt.subplots(figsize=(8, 5))
                 review_counts.plot(kind='bar', color='royalblue', ax=ax)
