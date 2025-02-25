@@ -226,7 +226,7 @@ def main():
                     df['score'], df['sentiment'] = zip(*results)
                     st.write("✅ Sentiment Analysis Completed!")
                     st.write("Sentiment Analysis Result:")
-                    st.dataframe(df[['content', 'sentiment', 'score']])
+                    st.dataframe(df)
                     st.download_button(label='Download CSV', data=df.to_csv(index=False), file_name='labeled_data.csv')
         except:
             st.write('Select The Correct File')
