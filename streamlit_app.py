@@ -138,7 +138,7 @@ def main():
                     # Load lexicon once
                     pos_lex, neg_lex = load_lexicon()
                     # Cleaning Text
-                     def cleansing(text):
+                    def cleansing(text):
                         text = re.sub(r"\d+", "", text)
                         text = text.encode('ascii', 'replace').decode('ascii')
                         text = ' '.join(re.sub("([@#][A-Za-z0-9]+)|(\\w+:\/\/\\S+)", " ", text).split())
