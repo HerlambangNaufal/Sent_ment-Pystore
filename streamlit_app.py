@@ -88,7 +88,6 @@ def main():
     # Pre-Processing & Labeling
     with tab2:
         try:
-        
             data_file = st.file_uploader("Upload CSV file",type=["csv"])            
             if data_file is not None :
                 df = pd.read_csv(data_file)
@@ -104,53 +103,31 @@ def main():
 
                 if proses or st.session_state.prosess:
                     st.session_state.prosess = True
-                
-                    def load_lexicon():
-                        try:
-                            pos_lex = set(pd.read_csv("positive.tsv", sep="\t", header=None, encoding='utf-8')[0])
-                            neg_lex = set(pd.read_csv("negative.tsv", sep="\t", header=None, encoding='utf-8')[0])
-                    
-                            # Debugging: cek jumlah kata dalam lexicon
-                            st.write(f"📌 Lexicon Loaded: {len(pos_lex)} Positive Words, {len(neg_lex)} Negative Words")
-                    
-                            return pos_lex, neg_lex
-                        except Exception as e:
-                            st.write(f"⚠️ Error loading lexicon: {e}")
-                            return set(), set()  # Jika gagal, kembalikan set kosong agar tidak error lebih lanjut
-                    
-                    def sentiment_analysis_lexicon_indonesia(text, pos_lex, neg_lex):
-                        score = 0
-                        for word in text:
-                            if word in pos_lex:
-                                score += 1
-                            elif word in neg_lex:
-                                score -= 1
-                        
-                        if score > 0:
-                            polarity = 'positive'
-                        elif score == 0:
-                            polarity = 'neutral'
-                        else:
-                            polarity = 'negative'
-                        
-                        return score, polarity
-                    
-                    # Load lexicon once
-                    pos_lex, neg_lex = load_lexicon()
+
                     # Cleaning Text
                     def cleansing(text):
-                        text = re.sub(r"\d+", "", text)
+                        #removing number
+                        text = re.sub(r"\d+","", text)
+                        # remove non ASCII (emoticon, chinese word, .etc)
                         text = text.encode('ascii', 'replace').decode('ascii')
-                        text = ' '.join(re.sub("([@#][A-Za-z0-9]+)|(\\w+:\/\/\\S+)", " ", text).split())
+                        # remove mention, link, hashtag
+                        text = ' '.join(re.sub("([@#][A-Za-z0-9]+)|(\w+:\/\/\S+)"," ", text).split())
+                        #Alphabeth only, exclude number and special character
                         text = re.sub(r'[^a-zA-Z]', ' ', text)
                         text = re.sub(r'\b[a-zA-Z]\b', ' ', text)
+                        # replace word repetition with a single occutance ('oooooooo' to 'o')
                         text = re.sub(r'(.)\1+', r'\1\1', text)
+                        # replace punctations repetitions with a single occurance ('!!!!!!!' to '!')
                         text = re.sub(r'[\?\.\!]+(?=[\?.\!])', '', text)
-                        text = re.sub('\s+', ' ', text)
-                        text = text.translate(str.maketrans("", "", string.punctuation))
+                        #remove multiple whitespace into single whitespace
+                        text = re.sub('\s+',' ',text)
+                        #remove punctuation
+                        text = text.translate(text.maketrans("","",string.punctuation))
+                        # Remove double word
                         text = text.strip()
                         text = ' '.join(dict.fromkeys(text.split()))
-                        return text.lower()
+                        return text
+
                     # Case folding text
                     def casefolding(text):
                         text = text.lower()
@@ -191,10 +168,10 @@ def main():
                     st.write("Start Pre-processing")
 
                     st.caption("| cleaning...")
-                    df['clean_text'] = df['content'].astype(str).apply(cleansing)
+                    df['cleansing'] = df['content'].apply(cleansing)
 
                     st.caption("| case folding...")
-                    df['case_folding'] = df['clean_text'].apply(casefolding)
+                    df['case_folding'] = df['cleansing'].apply(casefolding)
                     
                     st.caption("| tokenizing...")
                     df['text_tokenize'] = df['case_folding'].apply(tokenize)
@@ -220,16 +197,42 @@ def main():
                     # Determine sentiment polarity of doc using indonesia sentiment lexicon
                     st.write("Count Polarity and Labeling...")
                     st.caption("using indonesia sentiment lexicon")
+                    lexicon = dict()
+                    import csv
+                    with open('InSet_Lexicon.csv', 'r') as csvfile:
+                        reader = csv.reader(csvfile, delimiter=',')
+                        for row in reader:
+                            lexicon[row[0]] = int(row[1])
 
-                    st.write("🔍 Running Sentiment Analysis on Processed Text...")
-                    results = df['text_stopword'].apply(lambda x: sentiment_analysis_lexicon_indonesia(x, pos_lex, neg_lex))
-                    df['score'], df['sentiment'] = zip(*results)
-                    st.write("✅ Sentiment Analysis Completed!")
-                    st.write("Sentiment Analysis Result:")
+                    # Function to determine sentiment polarity of tweets        
+                    def sentiment_analysis_lexicon_indonesia(text):
+                        #for word in text:
+                        score = 0
+                        for word in text:
+                            if (word in lexicon):
+                                score = score + lexicon[word]
+
+                        polarity=''
+                        if (score > 0):
+                            polarity = 'positive'
+                        elif (score == 0):
+                            polarity = 'neutral'
+                        else:
+                            polarity = 'negative'
+                        return score, polarity
+
+                    results = df['text_stopword'].apply(sentiment_analysis_lexicon_indonesia)
+                    results = list(zip(*results))
+                    df['score'] = results[0]
+                    df['sentiment'] = results[1]
+                    st.text(df['sentiment'].value_counts())
+
                     st.dataframe(df)
-                    st.download_button(label='Download CSV', data=df.to_csv(index=False), file_name='labeled_data.csv')
+                    st.download_button(label='Download CSV', data = df.to_csv(index=False, encoding='utf8'), file_name='Labeled_'+url+'.csv',on_click=callback)
+
         except:
             st.write('Select The Correct File')
+
 
     with tab3:
         try:
