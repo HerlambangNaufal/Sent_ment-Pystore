@@ -106,9 +106,17 @@ def main():
                     st.session_state.prosess = True
                 
                     def load_lexicon():
-                        pos_lex = set(pd.read_csv("positive.tsv", sep="\t", header=None)[0])
-                        neg_lex = set(pd.read_csv("negative.tsv", sep="\t", header=None)[0])
-                        return pos_lex, neg_lex
+                        try:
+                            pos_lex = set(pd.read_csv("positive.tsv", sep="\t", header=None, encoding='utf-8')[0])
+                            neg_lex = set(pd.read_csv("negative.tsv", sep="\t", header=None, encoding='utf-8')[0])
+                    
+                            # Debugging: cek jumlah kata dalam lexicon
+                            st.write(f"📌 Lexicon Loaded: {len(pos_lex)} Positive Words, {len(neg_lex)} Negative Words")
+                    
+                            return pos_lex, neg_lex
+                        except Exception as e:
+                            st.write(f"⚠️ Error loading lexicon: {e}")
+                            return set(), set()  # Jika gagal, kembalikan set kosong agar tidak error lebih lanjut
                     
                     def sentiment_analysis_lexicon_indonesia(text, pos_lex, neg_lex):
                         score = 0
