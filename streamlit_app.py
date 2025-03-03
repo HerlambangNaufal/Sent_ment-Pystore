@@ -87,145 +87,145 @@ def main():
 
         # Pre-Processing & Labeling
     with tab2:
-    try:
-        data_file = st.file_uploader("Upload CSV file", type=["csv"])            
-        if data_file is not None:
-            df = pd.read_csv(data_file)
-            st.dataframe(df)
-
-            proses = st.button('Start process')
-
-            if "prosess" not in st.session_state:
-                st.session_state.prosess = False
-
-            def callback():
-                st.session_state.prosess = False
-
-            if proses or st.session_state.prosess:
-                st.session_state.prosess = True
-
-                # Cleaning Text
-                def cleansing(text):
-                    text = re.sub(r"\d+", "", text)
-                    text = text.encode('ascii', 'replace').decode('ascii')
-                    text = ' '.join(re.sub("([@#][A-Za-z0-9]+)|(\w+:\/\/\S+)", " ", text).split())
-                    text = re.sub(r'[^a-zA-Z]', ' ', text)
-                    text = re.sub(r'\b[a-zA-Z]\b', ' ', text)
-                    text = re.sub(r'(.)\1+', r'\1\1', text)
-                    text = re.sub(r'[\?\.\!]+(?=[\?.\!])', '', text)
-                    text = re.sub('\s+',' ', text)
-                    text = text.translate(text.maketrans("","",string.punctuation))
-                    text = text.strip()
-                    text = ' '.join(dict.fromkeys(text.split()))
-                    return text
-
-                # Case folding text
-                def casefolding(text):
-                    return text.lower()
-
-                # Tokenize text
-                def tokenize(text):
-                    return word_tokenize(text)
-
-                # Normalisasi text
-                normalizad_word = pd.read_excel("colloquial-indonesian-lexicon.xlsx")
-                normalizad_word_dict = {row[0]: row[1] for _, row in normalizad_word.iterrows()}
-
-                def normalized_term(text):
-                    return [normalizad_word_dict.get(term, term) for term in text]
-
-                # Filtering | stopwords removal
-                def stopword(text):
-                    listStopwords = set(stopwords.words('indonesian'))
-                    return [txt for txt in text if txt not in listStopwords]
-
-                # Remove punctuation
-                def remove_punct(text):
-                    return " ".join([char for char in text if char not in string.punctuation])
-
-                # Deploy Function
-                st.write("===========================================================")
-                st.write("Start Pre-processing")
-
-                st.caption("| cleaning...")
-                df['cleansing'] = df['content'].apply(cleansing)
-
-                st.caption("| case folding...")
-                df['case_folding'] = df['cleansing'].apply(casefolding)
-                
-                st.caption("| tokenizing...")
-                df['text_tokenize'] = df['case_folding'].apply(tokenize)
-
-                st.caption("| normalization...")
-                df['tweet_normalized'] = df['text_tokenize'].apply(normalized_term)
-
-                st.caption("| removal stopwords...")
-                df['text_stopword'] = df['tweet_normalized'].apply(stopword)
-
-                # Remove punctuation
-                df['text_clean'] = df['text_stopword'].apply(remove_punct)
-                df['text_clean'].replace('', np.nan, inplace=True)
-                df.dropna(subset=['text_clean'], inplace=True)
-                df = df.reset_index(drop=True)
-                st.write("Finish Pre-processing")
-                st.write("===========================================================")
-            
-                # Determine sentiment polarity of doc using Indonesia Sentiment Lexicon
-                st.write("Count Polarity and Labeling...")
-                st.caption("using indonesia sentiment lexicon")
-                lexicon = dict()
-                import csv
-                with open('InSet_Lexicon.csv', 'r') as csvfile:
-                    reader = csv.reader(csvfile, delimiter=',')
-                    for row in reader:
-                        lexicon[row[0]] = int(row[1])
-
-                # Fungsi sentiment analysis yang diperbarui (mengembalikan total_score, polarity, dan word_scores)
-                def sentiment_analysis_lexicon_indonesia(text):
-                    word_scores = []
-                    total_score = 0
-                    for word in text:
-                        score = lexicon.get(word, 0)
-                        word_scores.append(score)
-                        total_score += score
-
-                    polarity = 'neutral'
-                    if total_score > 0:
-                        polarity = 'positive'
-                    elif total_score < 0:
-                        polarity = 'negative'
-                    
-                    return total_score, polarity, word_scores
-
-                # Terapkan analisis sentimen
-                results = df['text_stopword'].apply(sentiment_analysis_lexicon_indonesia)
-                results = list(zip(*results))
-                df['score'] = results[0]
-                df['sentiment'] = results[1]
-                df['word_scores'] = results[2]
-
-                # Reorder kolom: letakkan 'word_scores' sebelum 'sentiment'
-                cols = df.columns.tolist()
-                # Pastikan kolom yang penting sudah ada
-                if 'content' in cols and 'word_scores' in cols and 'sentiment' in cols:
-                    # Menghapus kolom yang sudah ditentukan dari list
-                    for col in ['content', 'word_scores', 'sentiment', 'score']:
-                        cols.remove(col)
-                    new_order = ['content', 'word_scores', 'sentiment', 'score'] + cols
-                    df = df[new_order]
-
-                st.text(df['sentiment'].value_counts())
+        try:
+            data_file = st.file_uploader("Upload CSV file", type=["csv"])            
+            if data_file is not None:
+                df = pd.read_csv(data_file)
                 st.dataframe(df)
-                st.download_button(
-                    label='Download CSV',
-                    data=df.to_csv(index=False, encoding='utf8'),
-                    file_name='Labeled_Output.csv',
-                    on_click=callback
-                )
-
-    except Exception as e:
-        st.write('Select The Correct File')
-        st.write(e)
+    
+                proses = st.button('Start process')
+    
+                if "prosess" not in st.session_state:
+                    st.session_state.prosess = False
+    
+                def callback():
+                    st.session_state.prosess = False
+    
+                if proses or st.session_state.prosess:
+                    st.session_state.prosess = True
+    
+                    # Cleaning Text
+                    def cleansing(text):
+                        text = re.sub(r"\d+", "", text)
+                        text = text.encode('ascii', 'replace').decode('ascii')
+                        text = ' '.join(re.sub("([@#][A-Za-z0-9]+)|(\w+:\/\/\S+)", " ", text).split())
+                        text = re.sub(r'[^a-zA-Z]', ' ', text)
+                        text = re.sub(r'\b[a-zA-Z]\b', ' ', text)
+                        text = re.sub(r'(.)\1+', r'\1\1', text)
+                        text = re.sub(r'[\?\.\!]+(?=[\?.\!])', '', text)
+                        text = re.sub('\s+',' ', text)
+                        text = text.translate(text.maketrans("","",string.punctuation))
+                        text = text.strip()
+                        text = ' '.join(dict.fromkeys(text.split()))
+                        return text
+    
+                    # Case folding text
+                    def casefolding(text):
+                        return text.lower()
+    
+                    # Tokenize text
+                    def tokenize(text):
+                        return word_tokenize(text)
+    
+                    # Normalisasi text
+                    normalizad_word = pd.read_excel("colloquial-indonesian-lexicon.xlsx")
+                    normalizad_word_dict = {row[0]: row[1] for _, row in normalizad_word.iterrows()}
+    
+                    def normalized_term(text):
+                        return [normalizad_word_dict.get(term, term) for term in text]
+    
+                    # Filtering | stopwords removal
+                    def stopword(text):
+                        listStopwords = set(stopwords.words('indonesian'))
+                        return [txt for txt in text if txt not in listStopwords]
+    
+                    # Remove punctuation
+                    def remove_punct(text):
+                        return " ".join([char for char in text if char not in string.punctuation])
+    
+                    # Deploy Function
+                    st.write("===========================================================")
+                    st.write("Start Pre-processing")
+    
+                    st.caption("| cleaning...")
+                    df['cleansing'] = df['content'].apply(cleansing)
+    
+                    st.caption("| case folding...")
+                    df['case_folding'] = df['cleansing'].apply(casefolding)
+                    
+                    st.caption("| tokenizing...")
+                    df['text_tokenize'] = df['case_folding'].apply(tokenize)
+    
+                    st.caption("| normalization...")
+                    df['tweet_normalized'] = df['text_tokenize'].apply(normalized_term)
+    
+                    st.caption("| removal stopwords...")
+                    df['text_stopword'] = df['tweet_normalized'].apply(stopword)
+    
+                    # Remove punctuation
+                    df['text_clean'] = df['text_stopword'].apply(remove_punct)
+                    df['text_clean'].replace('', np.nan, inplace=True)
+                    df.dropna(subset=['text_clean'], inplace=True)
+                    df = df.reset_index(drop=True)
+                    st.write("Finish Pre-processing")
+                    st.write("===========================================================")
+                
+                    # Determine sentiment polarity of doc using Indonesia Sentiment Lexicon
+                    st.write("Count Polarity and Labeling...")
+                    st.caption("using indonesia sentiment lexicon")
+                    lexicon = dict()
+                    import csv
+                    with open('InSet_Lexicon.csv', 'r') as csvfile:
+                        reader = csv.reader(csvfile, delimiter=',')
+                        for row in reader:
+                            lexicon[row[0]] = int(row[1])
+    
+                    # Fungsi sentiment analysis yang diperbarui (mengembalikan total_score, polarity, dan word_scores)
+                    def sentiment_analysis_lexicon_indonesia(text):
+                        word_scores = []
+                        total_score = 0
+                        for word in text:
+                            score = lexicon.get(word, 0)
+                            word_scores.append(score)
+                            total_score += score
+    
+                        polarity = 'neutral'
+                        if total_score > 0:
+                            polarity = 'positive'
+                        elif total_score < 0:
+                            polarity = 'negative'
+                        
+                        return total_score, polarity, word_scores
+    
+                    # Terapkan analisis sentimen
+                    results = df['text_stopword'].apply(sentiment_analysis_lexicon_indonesia)
+                    results = list(zip(*results))
+                    df['score'] = results[0]
+                    df['sentiment'] = results[1]
+                    df['word_scores'] = results[2]
+    
+                    # Reorder kolom: letakkan 'word_scores' sebelum 'sentiment'
+                    cols = df.columns.tolist()
+                    # Pastikan kolom yang penting sudah ada
+                    if 'content' in cols and 'word_scores' in cols and 'sentiment' in cols:
+                        # Menghapus kolom yang sudah ditentukan dari list
+                        for col in ['content', 'word_scores', 'sentiment', 'score']:
+                            cols.remove(col)
+                        new_order = ['content', 'word_scores', 'sentiment', 'score'] + cols
+                        df = df[new_order]
+    
+                    st.text(df['sentiment'].value_counts())
+                    st.dataframe(df)
+                    st.download_button(
+                        label='Download CSV',
+                        data=df.to_csv(index=False, encoding='utf8'),
+                        file_name='Labeled_Output.csv',
+                        on_click=callback
+                    )
+    
+        except Exception as e:
+            st.write('Select The Correct File')
+            st.write(e)
 
 
     with tab3:
