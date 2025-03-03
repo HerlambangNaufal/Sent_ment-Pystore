@@ -143,7 +143,7 @@ def main():
                     def remove_punct(text):
                         return " ".join([char for char in text if char not in string.punctuation])
     
-                    # Deploy Function
+                    # Preprocessing
                     st.write("===========================================================")
                     st.write("Start Pre-processing")
     
@@ -180,7 +180,7 @@ def main():
                         for row in reader:
                             lexicon[row[0]] = int(row[1])
     
-                    # Fungsi sentiment analysis yang diperbarui (mengembalikan total_score, polarity, dan word_scores)
+                    # Fungsi sentiment analysis (mengembalikan total_score, polarity, dan word_scores)
                     def sentiment_analysis_lexicon_indonesia(text):
                         word_scores = []
                         total_score = 0
@@ -197,21 +197,12 @@ def main():
                         
                         return total_score, polarity, word_scores
     
-                    # Terapkan analisis sentimen
+                    # Terapkan analisis sentimen dan tambahkan kolom baru di bagian belakang
                     results = df['text_stopword'].apply(sentiment_analysis_lexicon_indonesia)
                     results = list(zip(*results))
-    
                     df['score'] = results[0]
                     df['sentiment'] = results[1]
                     df['word_scores'] = results[2]
-    
-                    # Reorder kolom: letakkan 'word_scores' sebelum 'sentiment'
-                    cols = df.columns.tolist()
-                    if 'content' in cols and 'word_scores' in cols and 'sentiment' in cols:
-                        for col in ['content', 'word_scores', 'sentiment', 'score']:
-                            cols.remove(col)
-                        new_order = ['content', 'word_scores', 'sentiment', 'score'] + cols
-                        df = df[new_order]
     
                     st.text(df['sentiment'].value_counts())
                     st.dataframe(df)
@@ -225,7 +216,6 @@ def main():
         except Exception as e:
             st.write('Select The Correct File')
             st.write(e)
-
     with tab3:
         try:
             data_file = st.file_uploader("Upload Labeled CSV file",type=["csv"])
