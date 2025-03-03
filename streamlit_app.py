@@ -218,8 +218,8 @@ def main():
                         on_click=callback
                     )
 
-    except:
-        st.write('Select The Correct File')
+        except:
+            st.write('Select The Correct File')
 
     with tab3:
         try:
