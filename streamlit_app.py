@@ -119,22 +119,22 @@ def main():
                         text = ' '.join(dict.fromkeys(text.split()))
                         return text
     
-                    # Case folding
+                    # Case folding text
                     def casefolding(text):
                         return text.lower()
     
-                    # Tokenizing
+                    # Tokenize text
                     def tokenize(text):
                         return word_tokenize(text)
     
-                    # Normalisasi
+                    # Normalisasi text
                     normalizad_word = pd.read_excel("colloquial-indonesian-lexicon.xlsx")
                     normalizad_word_dict = {row[0]: row[1] for _, row in normalizad_word.iterrows()}
     
                     def normalized_term(text):
                         return [normalizad_word_dict.get(term, term) for term in text]
     
-                    # Stopword removal
+                    # Filtering | stopwords removal
                     def stopword(text):
                         listStopwords = set(stopwords.words('indonesian'))
                         return [txt for txt in text if txt not in listStopwords]
@@ -143,7 +143,7 @@ def main():
                     def remove_punct(text):
                         return " ".join([char for char in text if char not in string.punctuation])
     
-                    # Preprocessing
+                    # Deploy Function
                     st.write("===========================================================")
                     st.write("Start Pre-processing")
     
@@ -173,23 +173,21 @@ def main():
                     # Load Lexicon
                     st.write("Count Polarity and Labeling...")
                     st.caption("Using Indonesia Sentiment Lexicon")
-                    lexicon = {}
+                    lexicon = dict()
+                    import csv
                     with open('InSet_Lexicon.csv', 'r') as csvfile:
                         reader = csv.reader(csvfile, delimiter=',')
                         for row in reader:
                             lexicon[row[0]] = int(row[1])
     
-                    # Function to determine sentiment polarity of tweets        
+                    # Fungsi sentiment analysis yang diperbarui (mengembalikan total_score, polarity, dan word_scores)
                     def sentiment_analysis_lexicon_indonesia(text):
                         word_scores = []
                         total_score = 0
-    
                         for word in text:
                             score = lexicon.get(word, 0)
                             word_scores.append(score)
                             total_score += score
-    
-                        score_string = "(" + ", ".join(f"{s:+}" for s in word_scores) + ")"
     
                         polarity = 'neutral'
                         if total_score > 0:
@@ -197,8 +195,9 @@ def main():
                         elif total_score < 0:
                             polarity = 'negative'
                         
-                        return total_score, polarity, word_scores, score_string
+                        return total_score, polarity, word_scores
     
+                    # Terapkan analisis sentimen
                     results = df['text_stopword'].apply(sentiment_analysis_lexicon_indonesia)
                     results = list(zip(*results))
     
@@ -206,20 +205,26 @@ def main():
                     df['sentiment'] = results[1]
                     df['word_scores'] = results[2]
     
+                    # Reorder kolom: letakkan 'word_scores' sebelum 'sentiment'
+                    cols = df.columns.tolist()
+                    if 'content' in cols and 'word_scores' in cols and 'sentiment' in cols:
+                        for col in ['content', 'word_scores', 'sentiment', 'score']:
+                            cols.remove(col)
+                        new_order = ['content', 'word_scores', 'sentiment', 'score'] + cols
+                        df = df[new_order]
+    
                     st.text(df['sentiment'].value_counts())
-    
                     st.dataframe(df)
-    
-                    # Tombol download hasil analisis
                     st.download_button(
                         label='Download CSV',
                         data=df.to_csv(index=False, encoding='utf8'),
-                        file_name='Labeled_'+url+'.csv',
+                        file_name='Labeled_Output.csv',
                         on_click=callback
                     )
-
-        except:
+    
+        except Exception as e:
             st.write('Select The Correct File')
+            st.write(e)
 
     with tab3:
         try:
