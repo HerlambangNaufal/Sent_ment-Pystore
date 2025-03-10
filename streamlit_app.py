@@ -137,6 +137,7 @@ def main():
                     # Filtering | stopwords removal
                     def stopword(text):
                         listStopwords = set(stopwords.words('indonesian'))
+                        listStopwords.update(["nya", "ya"])
                         return [txt for txt in text if txt not in listStopwords]
     
                     # Remove punctuation
