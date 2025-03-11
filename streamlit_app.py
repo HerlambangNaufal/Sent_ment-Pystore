@@ -474,7 +474,7 @@ def main():
                     clfsvm.fit(X_train, Y_train)
                     predict = clfsvm.predict(X_test)
     
-                    st.write(f"Jumlah data uji: {len(X_test)}")
+                    st.write(f"Jumlah data uji: {X_test.shape[0]}")
                     st.write("SVM Accuracy score  -> ", accuracy_score(Y_test, predict) * 100)
                     st.write("SVM Recall Score    -> ", recall_score(Y_test, predict, average='macro') * 100)
                     st.write("SVM Precision score -> ", precision_score(Y_test, predict, average='macro') * 100)
