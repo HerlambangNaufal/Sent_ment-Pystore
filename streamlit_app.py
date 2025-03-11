@@ -410,24 +410,21 @@ def main():
     with tab4:
         try:
             import seaborn as sns
-            data_file = st.file_uploader("Upload labeled CSV file",type=["csv"])
-            if data_file is not None :
+            data_file = st.file_uploader("Upload labeled CSV file", type=["csv"])
+            if data_file is not None:
                 df = pd.read_csv(data_file)
                 st.dataframe(df)
-
-                proseseval = st.button('Start processs')
-
+    
+                proseseval = st.button('Start process')
+    
                 if "evalmodel" not in st.session_state:
                     st.session_state.evalmodel = False
-
-                def callback():
-                    st.session_state.evalmodel = False
-
+    
                 if proseseval or st.session_state.evalmodel:
                     st.session_state.evalmodel = True
-
+    
                     st.write("\n Counting SVM Accuracy...")
-
+    
                     def score_sentiment(score):
                         if score == 'positive':
                             return "positive"
@@ -435,77 +432,58 @@ def main():
                             return "negative"
                         else:
                             return "neutral"
-
-                    biner = df['sentiment'].apply(score_sentiment)
-
-                    X_train, X_test, Y_train, Y_test = train_test_split(df['text_clean'], biner, test_size=0.2, stratify=biner, random_state=42)
-                    # Jumlah data latih
+    
+                    df['sentiment'] = df['sentiment'].apply(score_sentiment)
+    
+                    X_train, X_test, Y_train, Y_test = train_test_split(
+                        df['text_clean'], df['sentiment'], 
+                        test_size=0.2, stratify=df['sentiment'], random_state=42
+                    )
+    
                     jumlah_data_latih_positive = sum(Y_train == "positive")
                     jumlah_data_latih_negative = sum(Y_train == "negative")
                     jumlah_data_latih_neutral = sum(Y_train == "neutral")
-
+    
                     st.write("Data Latih:")
                     st.write(f"Jumlah data latih dengan sentimen positive: {jumlah_data_latih_positive}")
                     st.write(f"Jumlah data latih dengan sentimen negative: {jumlah_data_latih_negative}")
                     st.write(f"Jumlah data latih dengan sentimen neutral: {jumlah_data_latih_neutral}")
-
-                    st.write("====================================================================")
-
-                    from sklearn.model_selection import cross_val_score, StratifiedKFold
-                    st.subheader("Evaluasi Model dengan Cross-Validation")
     
-                    # Konversi text_clean ke fitur numerik menggunakan TF-IDF
+                    st.write("====================================================================")
+    
+                    # Konversi text_clean ke fitur numerik menggunakan satu TF-IDF vectorizer
                     vectorizer = TfidfVectorizer()
-                    X = vectorizer.fit_transform(df['text_clean'])
-                    y = df['sentiment']
+                    X_train = vectorizer.fit_transform(X_train)
+                    X_test = vectorizer.transform(X_test)
+    
                     # Buat DataFrame TF-IDF
-                    tfidf_df = pd.DataFrame(X.toarray(), columns=vectorizer.get_feature_names_out())
-                    
+                    tfidf_df = pd.DataFrame(X_train.toarray(), columns=vectorizer.get_feature_names_out())
+    
                     # Hitung rata-rata TF-IDF untuk setiap kata
                     tfidf_mean = tfidf_df.mean().sort_values(ascending=False)
-                    
+    
                     # Tampilkan 20 kata dengan rata-rata TF-IDF tertinggi
                     top_words = tfidf_mean.head(20).reset_index()
                     top_words.columns = ["Word", "Average TF-IDF"]
-                    
-                    # Tampilkan hasil di Streamlit
+    
                     st.write("🔍 **Top 20 Most Important Words Based on TF-IDF:**")
                     st.dataframe(top_words)
     
                     # Definisikan model SVM
-                    clfsvm = svm.SVC(kernel="linear",class_weight="balanced")
-    
-                    # Gunakan 5-fold Cross-Validation
-                    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-                    accuracy = cross_val_score(clfsvm, X, y, cv=skf, scoring='accuracy')
-                    precision = cross_val_score(clfsvm, X, y, cv=skf, scoring='precision_macro')
-                    recall = cross_val_score(clfsvm, X, y, cv=skf, scoring='recall_macro')
-                    f1 = cross_val_score(clfsvm, X, y, cv=skf, scoring='f1_macro')
-    
-                    # Tampilkan hasil evaluasi
-                    st.write(f"Rata-rata Akurasi Model: {accuracy.mean():.2f}")
-                    st.write(f"Rata-rata Precision Model: {precision.mean():.2f}")
-                    st.write(f"Rata-rata Recall Model: {recall.mean():.2f}")
-                    st.write(f"Rata-rata F1-Score Model: {f1.mean():.2f}")
-
-                    
-                    # Jumlah data uji
-                    st.write(f"Jumlah data uji: {len(X_test)}")
-
-                    vectorizer = TfidfVectorizer()
-                    X_train = vectorizer.fit_transform(X_train)
-                    X_test = vectorizer.transform(X_test)
-
-                    clfsvm = svm.SVC(kernel="linear")
-                    clfsvm.fit(X_train,Y_train)
+                    clfsvm = svm.SVC(kernel="linear", class_weight="balanced")
+                    clfsvm.fit(X_train, Y_train)
                     predict = clfsvm.predict(X_test)
-
-                    st.write("SVM Accuracy score  -> ", accuracy_score(predict, Y_test)*100)
-                    st.write("SVM Recall Score    -> ", recall_score(predict, Y_test, average='macro')*100)
-                    st.write("SVM Precision score -> ", precision_score(predict, Y_test, average='macro')*100)
-                    st.write("SVM f1 score        -> ", f1_score(predict, Y_test, average='macro')*100)
+    
+                    st.write(f"Jumlah data uji: {len(X_test)}")
+                    st.write("SVM Accuracy score  -> ", accuracy_score(Y_test, predict) * 100)
+                    st.write("SVM Recall Score    -> ", recall_score(Y_test, predict, average='macro') * 100)
+                    st.write("SVM Precision score -> ", precision_score(Y_test, predict, average='macro') * 100)
+                    st.write("SVM f1 score        -> ", f1_score(Y_test, predict, average='macro') * 100)
+    
                     st.write("===========================================================")
-                    cm = confusion_matrix(predict, Y_test)
+    
+                    cm = confusion_matrix(Y_test, predict)
+    
                     # Buat heatmap dari confusion matrix
                     plt.figure(figsize=(8, 6))
                     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
@@ -515,11 +493,11 @@ def main():
                     plt.ylabel("True Labels")
                     plt.title("Confusion Matrix")
                     st.pyplot()
+    
                     st.write("===========================================================")
-                    st.text('classification report : \n'+ classification_report(predict, Y_test, zero_division=0))
-                    st.write("===========================================================")
-
-        except:
+                    st.text('classification report : \n' + classification_report(Y_test, predict, zero_division=0))
+    
+        except Exception as e:
             st.write(f'Terjadi kesalahan: {e}')
 
 if __name__ == '__main__':
