@@ -458,6 +458,19 @@ def main():
                     vectorizer = TfidfVectorizer()
                     X = vectorizer.fit_transform(df['text_clean'])
                     y = df['sentiment']
+                    # Buat DataFrame TF-IDF
+                    tfidf_df = pd.DataFrame(X.toarray(), columns=vectorizer.get_feature_names_out())
+                    
+                    # Hitung rata-rata TF-IDF untuk setiap kata
+                    tfidf_mean = tfidf_df.mean().sort_values(ascending=False)
+                    
+                    # Tampilkan 20 kata dengan rata-rata TF-IDF tertinggi
+                    top_words = tfidf_mean.head(20).reset_index()
+                    top_words.columns = ["Word", "Average TF-IDF"]
+                    
+                    # Tampilkan hasil di Streamlit
+                    st.write("🔍 **Top 20 Most Important Words Based on TF-IDF:**")
+                    st.dataframe(top_words)
     
                     # Definisikan model SVM
                     clfsvm = svm.SVC(kernel="linear")
