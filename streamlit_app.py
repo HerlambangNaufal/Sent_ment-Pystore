@@ -473,7 +473,7 @@ def main():
                     st.dataframe(top_words)
     
                     # Definisikan model SVM
-                    clfsvm = svm.SVC(kernel="linear")
+                    clfsvm = svm.SVC(kernel="linear",class_weight="balanced")
     
                     # Gunakan 5-fold Cross-Validation
                     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
