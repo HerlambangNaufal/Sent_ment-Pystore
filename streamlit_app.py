@@ -372,6 +372,19 @@ def main():
                     st.write(" ")
                 st.write("====================================================================")
                 st.subheader("Tren Rata-Rata Rating Google Play Store dari Tahun ke Tahun")
+                # Total jumlah ulasan per tahun menggunakan rating original
+                st.subheader("Total Jumlah Ulasan per Tahun")
+                
+                total_reviews_per_year = df.groupby('year')['score_original'].count()
+                
+                fig, ax = plt.subplots(figsize=(10, 5))
+                total_reviews_per_year.plot(kind='bar', ax=ax, color='royalblue')
+                ax.set_title("Total Jumlah Ulasan per Tahun", fontsize=16)
+                ax.set_xlabel("Tahun")
+                ax.set_ylabel("Jumlah Ulasan")
+                ax.grid(axis='y', linestyle='--', alpha=0.7)
+                
+                st.pyplot(fig)
                 
                 # Hitung rata-rata rating asli per tahun
                 avg_rating_per_year = df.groupby('year')['score_original'].mean()
