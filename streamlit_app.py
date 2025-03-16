@@ -488,7 +488,7 @@ def main():
                     st.dataframe(top_words)
     
                     # Definisikan model SVM
-                    clfsvm = svm.SVC(kernel="linear")
+                    clfsvm = svm.SVC(kernel="linear", class_weight="balanced")
                     clfsvm.fit(X_train, Y_train)
                     predict = clfsvm.predict(X_test)
     
