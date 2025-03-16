@@ -470,7 +470,7 @@ def main():
                     st.write("====================================================================")
     
                     # Konversi text_clean ke fitur numerik menggunakan satu TF-IDF vectorizer
-                    vectorizer = TfidfVectorizer()
+                    vectorizer = TfidfVectorizer(max_features=5000, ngram_range=(1,2))
                     X_train = vectorizer.fit_transform(X_train)
                     X_test = vectorizer.transform(X_test)
     
