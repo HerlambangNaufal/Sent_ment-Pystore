@@ -416,7 +416,7 @@ def main():
                 # distribusi sentimen per tahun
                 sentiment_distribution = df.groupby('year')['sentiment'].value_counts().unstack().fillna(0) 
                 st.write("Distribusi Sentimen per Tahun")
-                colors = {"positive": "#25993f", "negative": "#bf3d3d", "neutral": "#ebc746"}
+                colors = {"positive": "#25993f", "negative": "#bf3d3d", "neutral": "#cfaf3c"}
                 fig, ax = plt.subplots(figsize=(10, 6))
                 sentiment_distribution.plot(kind='bar', ax=ax, width=0.7, color=[colors[col] for col in sentiment_distribution.columns])
                 ax.set_title("Distribusi Sentimen per Tahun", fontsize=16)
