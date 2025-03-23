@@ -413,12 +413,12 @@ def main():
                 ax.grid(True)
                 st.pyplot(fig)
 
-                # Menghitung distribusi sentimen per tahun
-                sentiment_distribution = df.groupby('year')['sentiment'].value_counts().unstack().fillna(0)
-                
+                # distribusi sentimen per tahun
+                sentiment_distribution = df.groupby('year')['sentiment'].value_counts().unstack().fillna(0) 
                 st.write("Distribusi Sentimen per Tahun")
+                colors = {"positive": "green", "negative": "red", "neutral": "blue"}
                 fig, ax = plt.subplots(figsize=(10, 6))
-                sentiment_distribution.plot(kind='bar', colormap='viridis', ax=ax, width=0.7)
+                sentiment_distribution.plot(kind='bar', ax=ax, width=0.7, color=[colors[col] for col in sentiment_distribution.columns])
                 ax.set_title("Distribusi Sentimen per Tahun", fontsize=16)
                 ax.set_xlabel("Tahun", fontsize=12)
                 ax.set_ylabel("Jumlah Ulasan", fontsize=12)
