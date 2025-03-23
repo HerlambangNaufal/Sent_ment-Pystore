@@ -413,14 +413,16 @@ def main():
                 ax.grid(True)
                 st.pyplot(fig)
 
-                # Distribusi Sentimen per Tahun
+                # Menghitung distribusi sentimen per tahun
                 sentiment_distribution = df.groupby('year')['sentiment'].value_counts().unstack().fillna(0)
+                
                 st.write("Distribusi Sentimen per Tahun")
                 fig, ax = plt.subplots(figsize=(10, 6))
-                sentiment_distribution.plot(kind='bar', stacked=True, colormap='viridis', ax=ax)
+                sentiment_distribution.plot(kind='bar', colormap='viridis', ax=ax, width=0.7)
                 ax.set_title("Distribusi Sentimen per Tahun", fontsize=16)
-                ax.set_xlabel("Tahun")
-                ax.set_ylabel("Jumlah Ulasan")
+                ax.set_xlabel("Tahun", fontsize=12)
+                ax.set_ylabel("Jumlah Ulasan", fontsize=12)
+                ax.legend(title="Sentimen")  # Menambahkan legenda
                 st.pyplot(fig)
         except:
             st.write('Select The Correct File')
