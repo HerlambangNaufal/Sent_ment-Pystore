@@ -508,7 +508,7 @@ def main():
                     cm = confusion_matrix(Y_test, predict)
     
                     # Buat heatmap dari confusion matrix
-                    plt.figure(figsize=(8, 6))
+                    fig, ax = plt.subplots(figsize=(8, 6))
                     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
                                 xticklabels=["negative", "neutral", "positive"],
                                 yticklabels=["negative", "neutral", "positive"])
