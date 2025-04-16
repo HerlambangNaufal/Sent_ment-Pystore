@@ -472,7 +472,7 @@ def main():
                     st.write("====================================================================")
     
                     # Konversi text_clean ke fitur numerik menggunakan satu TF-IDF vectorizer
-                    vectorizer = TfidfVectorizer(max_features=5000, ngram_range=(1,2))
+                    vectorizer = TfidfVectorizer()
                     X_train = vectorizer.fit_transform(X_train)
                     X_test = vectorizer.transform(X_test)
     
@@ -490,7 +490,7 @@ def main():
                     st.dataframe(top_words)
     
                     # Definisikan model SVM
-                    clfsvm = svm.SVC(kernel="linear", class_weight="balanced")
+                    clfsvm = svm.SVC(kernel="linear")
                     clfsvm.fit(X_train, Y_train)
                     predict = clfsvm.predict(X_test)
     
