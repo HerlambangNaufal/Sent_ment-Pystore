@@ -439,7 +439,10 @@ def main():
     
                 if "evalmodel" not in st.session_state:
                     st.session_state.evalmodel = False
-    
+                    
+                def callback():
+                    st.session_state.evalmodel = False
+                    
                 if proseseval or st.session_state.evalmodel:
                     st.session_state.evalmodel = True
     
