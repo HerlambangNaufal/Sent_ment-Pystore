@@ -515,7 +515,7 @@ def main():
                     plt.xlabel("Predicted Labels")
                     plt.ylabel("True Labels")
                     plt.title("Confusion Matrix")
-                    st.pyplot()
+                    st.pyplot(fig)
     
                     st.write("===========================================================")
                     st.text('classification report : \n' + classification_report(Y_test, predict, zero_division=0))
