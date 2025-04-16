@@ -485,13 +485,6 @@ def main():
                     # Hitung rata-rata TF-IDF untuk setiap kata
                     tfidf_mean = tfidf_df.mean().sort_values(ascending=False)
     
-                    # Tampilkan 20 kata dengan rata-rata TF-IDF tertinggi
-                    top_words = tfidf_mean.head(20).reset_index()
-                    top_words.columns = ["Word", "Average TF-IDF"]
-    
-                    st.write("🔍 **Top 20 Most Important Words Based on TF-IDF:**")
-                    st.dataframe(top_words)
-    
                     # Definisikan model SVM
                     clfsvm = svm.SVC(kernel="linear")
                     clfsvm.fit(X_train, Y_train)
