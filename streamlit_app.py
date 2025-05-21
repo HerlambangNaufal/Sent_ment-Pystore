@@ -435,7 +435,7 @@ def main():
                 df = pd.read_csv(data_file)
                 st.dataframe(df)
     
-                proseseval = st.button('Start process')
+                proseseval = st.button('Start process', key='start_process_btn_tab4')
     
                 if "evalmodel" not in st.session_state:
                     st.session_state.evalmodel = False
