@@ -414,11 +414,14 @@ def main():
                 st.pyplot(fig)
 
                 # distribusi sentimen per tahun
-                sentiment_distribution = df.groupby('year')['sentiment'].value_counts().unstack().fillna(0) 
-                st.write("Distribusi Sentimen per Tahun")
-                colors = {"positive": "#25993f", "negative": "#bf3d3d", "neutral": "#cfaf3c"}
-                fig, ax = plt.subplots(figsize=(10, 6))
-                sentiment_distribution.plot(kind='bar', ax=ax, width=0.7, color=[colors[col] for col in sentiment_distribution.columns])
+                bars = sentiment_distribution.plot(kind='bar', ax=ax, width=0.7, 
+                                   color=[colors[col] for col in sentiment_distribution.columns])
+
+                # Tambahkan label jumlah pada tiap bar
+                for i in range(len(sentiment_distribution)):
+                    for j, sentiment in enumerate(sentiment_distribution.columns):
+                        value = sentiment_distribution.iloc[i][sentiment]
+                        ax.text(i + j*0.25 - 0.25, value + 1, f'{int(value)}', ha='center', va='bottom', fontsize=9)
                 ax.set_title("Distribusi Sentimen per Tahun", fontsize=16)
                 ax.set_xlabel("Tahun", fontsize=12)
                 ax.set_ylabel("Jumlah Ulasan", fontsize=12)
