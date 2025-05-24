@@ -22,7 +22,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import f1_score, recall_score, precision_score, confusion_matrix, accuracy_score, classification_report
 from collections import Counter
-from scipy.sparse import csr_matrix
 
 
 def main():
