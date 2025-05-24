@@ -436,12 +436,15 @@ def main():
             st.write('Select The Correct File')
     with tab4:
         try:
-            import seaborn as sns
-            import csv  # Ensure csv is imported
+            st.write("Checkpoint 1: Starting tab4 execution")
+            
+            # File uploader untuk dataset
             data_file = st.file_uploader("Upload labeled CSV file", type=["csv"])
+            
             if data_file is not None:
                 df = pd.read_csv(data_file)
                 st.dataframe(df)
+                st.write("Checkpoint 2: Data loaded successfully")
     
                 proseseval = st.button('Start process', key='start_process_btn_tab4')
     
@@ -453,74 +456,98 @@ def main():
     
                 if proseseval or st.session_state.evalmodel:
                     st.session_state.evalmodel = True
+                    st.write("Checkpoint 3: Process button clicked")
     
                     st.write("\n Counting SVM Accuracy...")
     
-                    def score_sentiment(score):
-                        if score == 'positive':
-                            return "positive"
-                        elif score == 'negative':
-                            return "negative"
-                        else:
-                            return "neutral"
-    
-                    df['sentiment'] = df['sentiment'].apply(score_sentiment)
-    
-                    # Load Lexicon and calculate Lexicon Score
-                    lexicon = {}
-                    with open('InSet_Lexicon.csv', 'r') as csvfile:
-                        reader = csv.reader(csvfile, delimiter=',')
-                        for row in reader:
-                            lexicon[row[0]] = int(row[1])
+                    # Load Lexicon
+                    st.write("Count Polarity and Labeling...")
+                    st.caption("Using Indonesia Sentiment Lexicon")
+                    lexicon = dict()
+                    with st.spinner("Loading Lexicon..."):
+                        with open('InSet_Lexicon.csv', 'r') as csvfile:
+                            reader = csv.reader(csvfile, delimiter=',')
+                            for row in reader:
+                                lexicon[row[0]] = int(row[1])
+                    st.write("Checkpoint 4: Lexicon loaded successfully with", len(lexicon), "entries")
     
                     def lexicon_score(text):
                         return sum(lexicon.get(word, 0) for word in text.split())
     
                     df['lexicon_score'] = df['text_clean'].astype(str).apply(lexicon_score)
+                    st.write("Checkpoint 5: Lexicon score calculated")
+                    st.write("Lexicon Score Distribution (before normalization):", df['lexicon_score'].describe())
+    
+                    # Normalisasi lexicon score
+                    scaler = MinMaxScaler()
+                    df['lexicon_score'] = scaler.fit_transform(df[['lexicon_score']])
+                    st.write("Checkpoint 6: Lexicon score normalized")
+                    st.write("Lexicon Score Distribution (after normalization):", df['lexicon_score'].describe())
     
                     # Split data
                     X_train, X_test, Y_train, Y_test = train_test_split(
                         df[['text_clean', 'lexicon_score']], df['sentiment'], 
                         test_size=0.2, stratify=df['sentiment'], random_state=42
                     )
+                    X_train_text = X_train['text_clean'].astype(str)
+                    X_test_text = X_test['text_clean'].astype(str)
+                    st.write("Checkpoint 7: Data split completed")
     
-                    # Convert text_clean to TF-IDF features
-                    vectorizer = TfidfVectorizer()
-                    X_train_tfidf = vectorizer.fit_transform(X_train['text_clean'])
-                    X_test_tfidf = vectorizer.transform(X_test['text_clean'])
+                    # Ekstraksi fitur TF-IDF dari teks
+                    vectorizer = TfidfVectorizer(max_features=5000, ngram_range=(1,2), stop_words=indonesian_stopwords)
+                    X_train_tfidf = vectorizer.fit_transform(X_train_text)
+                    X_test_tfidf = vectorizer.transform(X_test_text)
+                    st.write("Checkpoint 8: TF-IDF extracted")
     
-                    # Combine TF-IDF features with lexicon score
-                    import scipy.sparse as sp
-                    X_train_combined = sp.hstack((X_train_tfidf, X_train['lexicon_score'].values.reshape(-1, 1)))
-                    X_test_combined = sp.hstack((X_test_tfidf, X_test['lexicon_score'].values.reshape(-1, 1)))
+                    # Gabungkan TF-IDF dengan lexicon score
+                    X_train_df = pd.DataFrame(X_train_tfidf.toarray(), columns=vectorizer.get_feature_names_out())
+                    X_test_df = pd.DataFrame(X_test_tfidf.toarray(), columns=vectorizer.get_feature_names_out())
     
-                    # Define and train SVM model
-                    clfsvm = svm.SVC(kernel="linear")
-                    clfsvm.fit(X_train_combined, Y_train)
-                    predict = clfsvm.predict(X_test_combined)
+                    X_train_df['lexicon_score'] = X_train['lexicon_score'].values
+                    X_test_df['lexicon_score'] = X_test['lexicon_score'].values
+                    st.write("Checkpoint 9: Lexicon score added to features")
+                    st.write("Sample feature row:", X_train_df.iloc[0])  # Tampilkan contoh baris fitur
     
-                    st.write(f"Jumlah data uji: {X_test.shape[0]}")
-                    st.write("SVM Accuracy score  -> ", accuracy_score(Y_test, predict) * 100)
-                    st.write("SVM Recall Score    -> ", recall_score(Y_test, predict, average='macro') * 100)
-                    st.write("SVM Precision score -> ", precision_score(Y_test, predict, average='macro') * 100)
-                    st.write("SVM f1 score        -> ", f1_score(Y_test, predict, average='macro') * 100)
+                    X_train_df.reset_index(drop=True, inplace=True)
+                    X_test_df.reset_index(drop=True, inplace=True)
     
-                    st.write("===========================================================")
+                    X_train_final = csr_matrix(X_train_df.values)
+                    X_test_final = csr_matrix(X_test_df.values)
+                    st.write("Checkpoint 10: Features combined")
     
-                    cm = confusion_matrix(Y_test, predict)
+                    # Latih SVM
+                    clfsvm = svm.SVC(kernel="linear", class_weight="balanced")
+                    clfsvm.fit(X_train_final, Y_train)
+                    svm_pred = clfsvm.predict(X_test_final)
+                    st.write("Checkpoint 11: SVM trained and predicted")
     
-                    # Create heatmap of confusion matrix
+                    st.write("SVM Classification Report:")
+                    st.text(classification_report(Y_test, svm_pred, zero_division=0))
+    
+                    # Confusion Matrix
+                    cm = confusion_matrix(Y_test, svm_pred, labels=clfsvm.classes_)
                     fig, ax = plt.subplots(figsize=(8, 6))
                     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
-                                xticklabels=["negative", "neutral", "positive"],
-                                yticklabels=["negative", "neutral", "positive"])
+                                xticklabels=clfsvm.classes_,
+                                yticklabels=clfsvm.classes_)
                     plt.xlabel("Predicted Labels")
                     plt.ylabel("True Labels")
-                    plt.title("Confusion Matrix")
+                    plt.title("Confusion Matrix SVM")
                     st.pyplot(fig)
     
-                    st.write("===========================================================")
-                    st.text('classification report : \n' + classification_report(Y_test, predict, zero_division=0))
+                    # Cross-validation untuk cek overfitting
+                    st.write("Melakukan cross-validation 5-fold...")
+                    X_all_text = df['text_clean'].astype(str)
+                    X_all_lexicon = df['lexicon_score']
+    
+                    X_all_tfidf = vectorizer.fit_transform(X_all_text)
+                    X_all_df = pd.DataFrame(X_all_tfidf.toarray(), columns=vectorizer.get_feature_names_out())
+                    X_all_df['lexicon_score'] = X_all_lexicon.values
+                    X_all_final = csr_matrix(X_all_df.values)
+    
+                    cv_scores = cross_val_score(clfsvm, X_all_final, df['sentiment'], cv=5, scoring='accuracy')
+                    st.write(f"Cross-validation Accuracy scores: {cv_scores}")
+                    st.write(f"Rata-rata Accuracy: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
     
         except Exception as e:
             st.write(f'Terjadi kesalahan: {e}')
