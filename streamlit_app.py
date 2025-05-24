@@ -476,8 +476,8 @@ def main():
                             st.write("Checkpoint 5: Attempting to load Lexicon")
                             st.write("Current directory:", os.listdir())  # Debugging direktori
                             st.write("CSV module available:", 'csv' in globals())  # Cek apakah csv diimpor
-                            with open('InSet_Lexicon.csv', 'r') as csvfile:
-                                reader = csv.reader(csvfile, delimiter=',')
+                            with open('InSet_Lexicon.csv', 'r') as csvfile:  # ✅ ganti nama variabel
+                                reader = csv.reader(csvfile, delimiter=',')  # ✅ sekarang csv adalah modul bawaan lagi
                                 for row in reader:
                                     lexicon[row[0]] = int(row[1])
                             st.write("Checkpoint 6: Lexicon loaded successfully with", len(lexicon), "entries")
