@@ -539,20 +539,7 @@ def main():
                     plt.ylabel("True Labels")
                     plt.title("Confusion Matrix SVM")
                     st.pyplot(fig)
-    
-                    # Cross-validation untuk cek overfitting
-                    st.write("Melakukan cross-validation 5-fold...")
-                    X_all_text = df['text_clean'].astype(str)
-                    X_all_lexicon = df['lexicon_score']
-    
-                    X_all_tfidf = vectorizer.fit_transform(X_all_text)
-                    X_all_df = pd.DataFrame(X_all_tfidf.toarray(), columns=vectorizer.get_feature_names_out())
-                    X_all_df['lexicon_score'] = X_all_lexicon.values
-                    X_all_final = csr_matrix(X_all_df.values)
-    
-                    cv_scores = cross_val_score(clfsvm, X_all_final, df['sentiment'], cv=5, scoring='accuracy')
-                    st.write(f"Cross-validation Accuracy scores: {cv_scores}")
-                    st.write(f"Rata-rata Accuracy: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
+
     
         except Exception as e:
             st.write(f'Terjadi kesalahan: {e}')
