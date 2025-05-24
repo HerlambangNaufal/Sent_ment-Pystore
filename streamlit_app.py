@@ -443,6 +443,7 @@ def main():
             
             # File uploader untuk dataset
             data_file = st.file_uploader("Upload labeled CSV file", type=["csv"])
+            df = pd.read_csv(SAMPLE_DATA_PATH).drop_duplicates(subset=['text_clean'])
             
             if data_file is not None:
                 df = pd.read_csv(data_file)
