@@ -464,6 +464,7 @@ def main():
                     st.write("Count Polarity and Labeling...")
                     st.caption("Using Indonesia Sentiment Lexicon")
                     lexicon = dict()
+                    import csv
                     with st.spinner("Loading Lexicon..."):
                         with open('InSet_Lexicon.csv', 'r') as csvfile:
                             reader = csv.reader(csvfile, delimiter=',')
