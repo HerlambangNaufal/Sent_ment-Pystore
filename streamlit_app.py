@@ -506,7 +506,6 @@ def main():
                     vectorizer = TfidfVectorizer(max_features=5000, ngram_range=(1,2), stop_words=indonesian_stopwords)
                     X_train_tfidf = vectorizer.fit_transform(X_train_text)
                     X_test_tfidf = vectorizer.transform(X_test_text)
-                    st.write("Checkpoint 8: TF-IDF extracted")
     
                     # Gabungkan TF-IDF dengan lexicon score
                     X_train_df = pd.DataFrame(X_train_tfidf.toarray(), columns=vectorizer.get_feature_names_out())
@@ -514,15 +513,12 @@ def main():
     
                     X_train_df['lexicon_score'] = X_train['lexicon_score'].values
                     X_test_df['lexicon_score'] = X_test['lexicon_score'].values
-                    st.write("Checkpoint 9: Lexicon score added to features")
-                    st.write("Sample feature row:", X_train_df.iloc[0])  # Tampilkan contoh baris fitur
     
                     X_train_df.reset_index(drop=True, inplace=True)
                     X_test_df.reset_index(drop=True, inplace=True)
     
                     X_train_final = csr_matrix(X_train_df.values)
                     X_test_final = csr_matrix(X_test_df.values)
-                    st.write("Checkpoint 10: Features combined")
     
                     # Latih SVM
                     clfsvm = svm.SVC(kernel="linear", class_weight="balanced")
