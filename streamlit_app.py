@@ -10,7 +10,6 @@ import seaborn as sns
 import os
 nltk.download('punkt_tab')
 nltk.download('stopwords')
-indonesian_stopwords = list(stopwords.words('indonesian'))
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
@@ -487,6 +486,11 @@ def main():
                     df['lexicon_score'] = scaler.fit_transform(df[['lexicon_score']])
                     st.write("Checkpoint 6: Lexicon score normalized")
                     st.write("Lexicon Score Distribution (after normalization):", df['lexicon_score'].describe())
+                    # Unduh stopwords dan inisialisasi di sini
+                    with st.spinner("Downloading stopwords..."):
+                        nltk.download('stopwords', quiet=True)
+                        indonesian_stopwords = list(stopwords.words('indonesian'))
+                    st.write("Checkpoint 7: Stopwords downloaded and loaded")
     
                     # Split data
                     X_train, X_test, Y_train, Y_test = train_test_split(
