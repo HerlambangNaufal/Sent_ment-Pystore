@@ -501,7 +501,10 @@ def main():
                     X_train_text = X_train['text_clean'].astype(str)
                     X_test_text = X_test['text_clean'].astype(str)
                     st.write("Checkpoint 7: Data split completed")
-    
+                    # Periksa duplikat antara train dan test
+                    duplicates = pd.merge(X_train, X_test, how='inner', on='text_clean')
+                    st.write(f"Jumlah duplikat antara train dan test: {len(duplicates)}")
+            
                     # Ekstraksi fitur TF-IDF dari teks
                     vectorizer = TfidfVectorizer(max_features=200, ngram_range=(1,2), stop_words=indonesian_stopwords)
                     X_train_tfidf = vectorizer.fit_transform(X_train_text)
