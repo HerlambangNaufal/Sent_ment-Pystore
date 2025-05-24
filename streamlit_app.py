@@ -437,6 +437,7 @@ def main():
     with tab4:
         try:
             import seaborn as sns
+            import csv  # Ensure csv is imported
             data_file = st.file_uploader("Upload labeled CSV file", type=["csv"])
             if data_file is not None:
                 df = pd.read_csv(data_file)
@@ -446,10 +447,10 @@ def main():
     
                 if "evalmodel" not in st.session_state:
                     st.session_state.evalmodel = False
-                    
+    
                 def callback():
                     st.session_state.evalmodel = False
-                    
+    
                 if proseseval or st.session_state.evalmodel:
                     st.session_state.evalmodel = True
     
@@ -465,37 +466,38 @@ def main():
     
                     df['sentiment'] = df['sentiment'].apply(score_sentiment)
     
+                    # Load Lexicon and calculate Lexicon Score
+                    lexicon = {}
+                    with open('InSet_Lexicon.csv', 'r') as csvfile:
+                        reader = csv.reader(csvfile, delimiter=',')
+                        for row in reader:
+                            lexicon[row[0]] = int(row[1])
+    
+                    def lexicon_score(text):
+                        return sum(lexicon.get(word, 0) for word in text.split())
+    
+                    df['lexicon_score'] = df['text_clean'].astype(str).apply(lexicon_score)
+    
+                    # Split data
                     X_train, X_test, Y_train, Y_test = train_test_split(
-                        df['text_clean'], df['sentiment'], 
+                        df[['text_clean', 'lexicon_score']], df['sentiment'], 
                         test_size=0.2, stratify=df['sentiment'], random_state=42
                     )
     
-                    jumlah_data_latih_positive = sum(Y_train == "positive")
-                    jumlah_data_latih_negative = sum(Y_train == "negative")
-                    jumlah_data_latih_neutral = sum(Y_train == "neutral")
-    
-                    st.write("Data Latih:")
-                    st.write(f"Jumlah data latih dengan sentimen positive: {jumlah_data_latih_positive}")
-                    st.write(f"Jumlah data latih dengan sentimen negative: {jumlah_data_latih_negative}")
-                    st.write(f"Jumlah data latih dengan sentimen neutral: {jumlah_data_latih_neutral}")
-    
-                    st.write("====================================================================")
-    
-                    # Konversi text_clean ke fitur numerik menggunakan satu TF-IDF vectorizer
+                    # Convert text_clean to TF-IDF features
                     vectorizer = TfidfVectorizer()
-                    X_train = vectorizer.fit_transform(X_train)
-                    X_test = vectorizer.transform(X_test)
+                    X_train_tfidf = vectorizer.fit_transform(X_train['text_clean'])
+                    X_test_tfidf = vectorizer.transform(X_test['text_clean'])
     
-                    # Buat DataFrame TF-IDF
-                    tfidf_df = pd.DataFrame(X_train.toarray(), columns=vectorizer.get_feature_names_out())
+                    # Combine TF-IDF features with lexicon score
+                    import scipy.sparse as sp
+                    X_train_combined = sp.hstack((X_train_tfidf, X_train['lexicon_score'].values.reshape(-1, 1)))
+                    X_test_combined = sp.hstack((X_test_tfidf, X_test['lexicon_score'].values.reshape(-1, 1)))
     
-                    # Hitung rata-rata TF-IDF untuk setiap kata
-                    tfidf_mean = tfidf_df.mean().sort_values(ascending=False)
-    
-                    # Definisikan model SVM
+                    # Define and train SVM model
                     clfsvm = svm.SVC(kernel="linear")
-                    clfsvm.fit(X_train, Y_train)
-                    predict = clfsvm.predict(X_test)
+                    clfsvm.fit(X_train_combined, Y_train)
+                    predict = clfsvm.predict(X_test_combined)
     
                     st.write(f"Jumlah data uji: {X_test.shape[0]}")
                     st.write("SVM Accuracy score  -> ", accuracy_score(Y_test, predict) * 100)
@@ -507,7 +509,7 @@ def main():
     
                     cm = confusion_matrix(Y_test, predict)
     
-                    # Buat heatmap dari confusion matrix
+                    # Create heatmap of confusion matrix
                     fig, ax = plt.subplots(figsize=(8, 6))
                     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
                                 xticklabels=["negative", "neutral", "positive"],
