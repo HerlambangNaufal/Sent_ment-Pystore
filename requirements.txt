@@ -13,4 +13,3 @@ svm
 openpyxl
 plotly
 seaborn
-scipy
