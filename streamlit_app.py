@@ -436,7 +436,6 @@ def main():
     #        
     with tab4:
     try:
-        import seaborn as sns
         data_file = st.file_uploader("Upload labeled CSV file", type=["csv"])
         if data_file is not None:
             df = pd.read_csv(data_file)
@@ -467,15 +466,18 @@ def main():
 
                 # Hitung Lexicon Score
                 lexicon = {}
+                with st.spinner("Loading Lexicon..."):
                     with open('InSet_Lexicon.csv', 'r') as csvfile:
                         reader = csv.reader(csvfile, delimiter=',')
                         for row in reader:
                             lexicon[row[0]] = int(row[1])
+                st.write("Lexicon loaded with", len(lexicon), "entries")
 
                 def lexicon_score(text):
                     return sum(lexicon.get(word, 0) for word in text.split())
 
                 df['lexicon_score'] = df['text_clean'].astype(str).apply(lexicon_score)
+                st.write("Lexicon Score Stats:", df['lexicon_score'].describe())
 
                 # Normalisasi lexicon score
                 scaler = MinMaxScaler()
@@ -500,6 +502,8 @@ def main():
 
                 X_train_df['lexicon_score'] = X_train['lexicon_score'].values
                 X_test_df['lexicon_score'] = X_test['lexicon_score'].values
+                X_train_df.reset_index(drop=True, inplace=True)
+                X_test_df.reset_index(drop=True, inplace=True)
 
                 X_train_final = csr_matrix(X_train_df.values)
                 X_test_final = csr_matrix(X_test_df.values)
@@ -543,9 +547,6 @@ def main():
 
                 st.write("===========================================================")
                 st.text('classification report : \n' + classification_report(Y_test, predict, zero_division=0))
-    
-        except Exception as e:
-            st.write(f'Terjadi kesalahan: {e}')
 
 if __name__ == '__main__':
     main()
