@@ -2,7 +2,6 @@
 import streamlit as st
 from google_play_scraper import Sort, reviews
 import pandas as pd
-import csv
 import numpy as np
 import re
 import string
@@ -472,6 +471,7 @@ def main():
                             st.write("Checkpoint 5: Attempting to load Lexicon")
                             st.write("Current directory:", os.listdir())  # Debugging direktori
                             st.write("CSV module available:", 'csv' in globals())  # Cek apakah csv diimpor
+                            import csv
                             with open('InSet_Lexicon.csv', 'r') as csvfile:  # ✅ ganti nama variabel
                                 reader = csv.reader(csvfile, delimiter=',')  # ✅ sekarang csv adalah modul bawaan lagi
                                 for row in reader:
