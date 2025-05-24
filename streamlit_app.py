@@ -474,13 +474,14 @@ def main():
                         try:
                             st.write("Checkpoint 5: Attempting to load Lexicon")
                             st.write("Current directory:", os.listdir())  # Debugging direktori
+                            st.write("CSV module available:", 'csv' in globals())  # Cek apakah csv diimpor
                             with open('InSet_Lexicon.csv', 'r') as csvfile:
                                 reader = csv.reader(csvfile, delimiter=',')
                                 for row in reader:
                                     lexicon[row[0]] = int(row[1])
                             st.write("Checkpoint 6: Lexicon loaded successfully with", len(lexicon), "entries")
                         except FileNotFoundError:
-                            st.error("File InSet_Lexicon.csv not found in repository. Please ensure it exists in the same directory as streamlit_app.py.")
+                            st.error("File InSet_Lexicon.csv not found in repository. Please ensure it exists.")
                             st.stop()
                         except Exception as e:
                             st.error(f"Error loading Lexicon: {e}")
