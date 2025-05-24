@@ -435,10 +435,12 @@ def main():
             st.write('Select The Correct File')
     with tab4:
         try:
+            st.write("Checkpoint 1: Starting tab4 execution")
             data_file = st.file_uploader("Upload labeled CSV file", type=["csv"])
             if data_file is not None:
                 df = pd.read_csv(data_file)
                 st.dataframe(df)
+                st.write("Checkpoint 2: Data loaded successfully")
     
                 proseseval = st.button('Start process', key='start_process_btn_tab4')
     
@@ -450,6 +452,7 @@ def main():
     
                 if proseseval or st.session_state.evalmodel:
                     st.session_state.evalmodel = True
+                    st.write("Checkpoint 3: Process button clicked")
     
                     st.write("\n Counting SVM Accuracy...")
     
@@ -462,25 +465,37 @@ def main():
                             return "neutral"
     
                     df['sentiment'] = df['sentiment'].apply(score_sentiment)
+                    st.write("Checkpoint 4: Sentiment scored")
     
                     # Hitung Lexicon Score
                     lexicon = {}
                     with st.spinner("Loading Lexicon..."):
-                        with open('InSet_Lexicon.csv', 'r') as csvfile:
-                            reader = csv.reader(csvfile, delimiter=',')
-                            for row in reader:
-                                lexicon[row[0]] = int(row[1])
-                    st.write("Lexicon loaded with", len(lexicon), "entries")
+                        try:
+                            st.write("Checkpoint 5: Attempting to load Lexicon")
+                            st.write("Current directory:", os.listdir())  # Debugging direktori
+                            with open('InSet_Lexicon.csv', 'r') as csvfile:
+                                reader = csv.reader(csvfile, delimiter=',')
+                                for row in reader:
+                                    lexicon[row[0]] = int(row[1])
+                            st.write("Checkpoint 6: Lexicon loaded successfully with", len(lexicon), "entries")
+                        except FileNotFoundError:
+                            st.error("File InSet_Lexicon.csv not found in repository. Please ensure it exists in the same directory as streamlit_app.py.")
+                            st.stop()
+                        except Exception as e:
+                            st.error(f"Error loading Lexicon: {e}")
+                            st.stop()
     
                     def lexicon_score(text):
                         return sum(lexicon.get(word, 0) for word in text.split())
     
                     df['lexicon_score'] = df['text_clean'].astype(str).apply(lexicon_score)
+                    st.write("Checkpoint 7: Lexicon score calculated")
                     st.write("Lexicon Score Stats:", df['lexicon_score'].describe())
     
                     # Normalisasi lexicon score
                     scaler = MinMaxScaler()
                     df['lexicon_score'] = scaler.fit_transform(df[['lexicon_score']])
+                    st.write("Checkpoint 8: Lexicon score normalized")
     
                     # Split data
                     X_train, X_test, Y_train, Y_test = train_test_split(
@@ -489,11 +504,13 @@ def main():
                     )
                     X_train_text = X_train['text_clean'].astype(str)
                     X_test_text = X_test['text_clean'].astype(str)
+                    st.write("Checkpoint 9: Data split completed")
     
                     # Ekstraksi fitur TF-IDF dari teks
                     vectorizer = TfidfVectorizer(max_features=5000, ngram_range=(1,2), stop_words=indonesian_stopwords)
                     X_train_tfidf = vectorizer.fit_transform(X_train_text)
                     X_test_tfidf = vectorizer.transform(X_test_text)
+                    st.write("Checkpoint 10: TF-IDF extracted")
     
                     # Gabungkan TF-IDF dengan lexicon score
                     X_train_df = pd.DataFrame(X_train_tfidf.toarray(), columns=vectorizer.get_feature_names_out())
@@ -506,6 +523,7 @@ def main():
     
                     X_train_final = csr_matrix(X_train_df.values)
                     X_test_final = csr_matrix(X_test_df.values)
+                    st.write("Checkpoint 11: Features combined")
     
                     # Statistik data latih
                     jumlah_data_latih_positive = sum(Y_train == "positive")
@@ -523,6 +541,7 @@ def main():
                     clfsvm = svm.SVC(kernel="linear", class_weight="balanced")
                     clfsvm.fit(X_train_final, Y_train)
                     predict = clfsvm.predict(X_test_final)
+                    st.write("Checkpoint 12: SVM trained and predicted")
     
                     st.write(f"Jumlah data uji: {X_test.shape[0]}")
                     st.write("SVM Accuracy score  -> ", accuracy_score(Y_test, predict) * 100)
@@ -549,6 +568,5 @@ def main():
     
         except Exception as e:
             st.write(f'Terjadi kesalahan: {e}')
-
 if __name__ == '__main__':
     main()
