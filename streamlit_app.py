@@ -433,120 +433,122 @@ def main():
                 st.pyplot(fig)
         except:
             st.write('Select The Correct File')
-    #        
     with tab4:
-        try:
-            data_file = st.file_uploader("Upload labeled CSV file", type=["csv"])
-            if data_file is not None:
-                df = pd.read_csv(data_file)
-                st.dataframe(df)
-    
-                proseseval = st.button('Start process', key='start_process_btn_tab4')
-    
-                if "evalmodel" not in st.session_state:
-                    st.session_state.evalmodel = False
-    
-                def callback():
-                    st.session_state.evalmodel = False
-    
-                if proseseval or st.session_state.evalmodel:
-                    st.session_state.evalmodel = True
-    
-                    st.write("\n Counting SVM Accuracy...")
-    
-                    def score_sentiment(score):
-                        if score == 'positive':
-                            return "positive"
-                        elif score == 'negative':
-                            return "negative"
-                        else:
-                            return "neutral"
-    
-                    df['sentiment'] = df['sentiment'].apply(score_sentiment)
-    
-                    # Hitung Lexicon Score
-                    lexicon = {}
-                    with st.spinner("Loading Lexicon..."):
-                        with open('InSet_Lexicon.csv', 'r') as csvfile:
-                            reader = csv.reader(csvfile, delimiter=',')
-                            for row in reader:
-                                lexicon[row[0]] = int(row[1])
-                    st.write("Lexicon loaded with", len(lexicon), "entries")
-    
-                    def lexicon_score(text):
-                        return sum(lexicon.get(word, 0) for word in text.split())
-    
-                    df['lexicon_score'] = df['text_clean'].astype(str).apply(lexicon_score)
-                    st.write("Lexicon Score Stats:", df['lexicon_score'].describe())
-    
-                    # Normalisasi lexicon score
-                    scaler = MinMaxScaler()
-                    df['lexicon_score'] = scaler.fit_transform(df[['lexicon_score']])
-    
-                    # Split data
-                    X_train, X_test, Y_train, Y_test = train_test_split(
-                        df[['text_clean', 'lexicon_score']], df['sentiment'], 
-                        test_size=0.2, stratify=df['sentiment'], random_state=42
-                    )
-                    X_train_text = X_train['text_clean'].astype(str)
-                    X_test_text = X_test['text_clean'].astype(str)
-    
-                    # Ekstraksi fitur TF-IDF dari teks
-                    vectorizer = TfidfVectorizer(max_features=5000, ngram_range=(1,2), stop_words=indonesian_stopwords)
-                    X_train_tfidf = vectorizer.fit_transform(X_train_text)
-                    X_test_tfidf = vectorizer.transform(X_test_text)
-    
-                    # Gabungkan TF-IDF dengan lexicon score
-                    X_train_df = pd.DataFrame(X_train_tfidf.toarray(), columns=vectorizer.get_feature_names_out())
-                    X_test_df = pd.DataFrame(X_test_tfidf.toarray(), columns=vectorizer.get_feature_names_out())
-    
-                    X_train_df['lexicon_score'] = X_train['lexicon_score'].values
-                    X_test_df['lexicon_score'] = X_test['lexicon_score'].values
-                    X_train_df.reset_index(drop=True, inplace=True)
-                    X_test_df.reset_index(drop=True, inplace=True)
-    
-                    X_train_final = csr_matrix(X_train_df.values)
-                    X_test_final = csr_matrix(X_test_df.values)
-    
-                    # Statistik data latih
-                    jumlah_data_latih_positive = sum(Y_train == "positive")
-                    jumlah_data_latih_negative = sum(Y_train == "negative")
-                    jumlah_data_latih_neutral = sum(Y_train == "neutral")
-    
-                    st.write("Data Latih:")
-                    st.write(f"Jumlah data latih dengan sentimen positive: {jumlah_data_latih_positive}")
-                    st.write(f"Jumlah data latih dengan sentimen negative: {jumlah_data_latih_negative}")
-                    st.write(f"Jumlah data latih dengan sentimen neutral: {jumlah_data_latih_neutral}")
-    
-                    st.write("====================================================================")
-    
-                    # Latih SVM
-                    clfsvm = svm.SVC(kernel="linear", class_weight="balanced")
-                    clfsvm.fit(X_train_final, Y_train)
-                    predict = clfsvm.predict(X_test_final)
-    
-                    st.write(f"Jumlah data uji: {X_test.shape[0]}")
-                    st.write("SVM Accuracy score  -> ", accuracy_score(Y_test, predict) * 100)
-                    st.write("SVM Recall Score    -> ", recall_score(Y_test, predict, average='macro') * 100)
-                    st.write("SVM Precision score -> ", precision_score(Y_test, predict, average='macro') * 100)
-                    st.write("SVM f1 score        -> ", f1_score(Y_test, predict, average='macro') * 100)
-    
-                    st.write("===========================================================")
-    
-                    cm = confusion_matrix(Y_test, predict)
-    
-                    # Buat heatmap dari confusion matrix
-                    fig, ax = plt.subplots(figsize=(8, 6))
-                    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
-                                xticklabels=["negative", "neutral", "positive"],
-                                yticklabels=["negative", "neutral", "positive"])
-                    plt.xlabel("Predicted Labels")
-                    plt.ylabel("True Labels")
-                    plt.title("Confusion Matrix")
-                    st.pyplot(fig)
-    
-                    st.write("===========================================================")
-                    st.text('classification report : \n' + classification_report(Y_test, predict, zero_division=0))
+    try:
+        data_file = st.file_uploader("Upload labeled CSV file", type=["csv"])
+        if data_file is not None:
+            df = pd.read_csv(data_file)
+            st.dataframe(df)
+
+            proseseval = st.button('Start process', key='start_process_btn_tab4')
+
+            if "evalmodel" not in st.session_state:
+                st.session_state.evalmodel = False
+
+            def callback():
+                st.session_state.evalmodel = False
+
+            if proseseval or st.session_state.evalmodel:
+                st.session_state.evalmodel = True
+
+                st.write("\n Counting SVM Accuracy...")
+
+                def score_sentiment(score):
+                    if score == 'positive':
+                        return "positive"
+                    elif score == 'negative':
+                        return "negative"
+                    else:
+                        return "neutral"
+
+                df['sentiment'] = df['sentiment'].apply(score_sentiment)
+
+                # Hitung Lexicon Score
+                lexicon = {}
+                with st.spinner("Loading Lexicon..."):
+                    with open('InSet_Lexicon.csv', 'r') as csvfile:
+                        reader = csv.reader(csvfile, delimiter=',')
+                        for row in reader:
+                            lexicon[row[0]] = int(row[1])
+                st.write("Lexicon loaded with", len(lexicon), "entries")
+
+                def lexicon_score(text):
+                    return sum(lexicon.get(word, 0) for word in text.split())
+
+                df['lexicon_score'] = df['text_clean'].astype(str).apply(lexicon_score)
+                st.write("Lexicon Score Stats:", df['lexicon_score'].describe())
+
+                # Normalisasi lexicon score
+                scaler = MinMaxScaler()
+                df['lexicon_score'] = scaler.fit_transform(df[['lexicon_score']])
+
+                # Split data
+                X_train, X_test, Y_train, Y_test = train_test_split(
+                    df[['text_clean', 'lexicon_score']], df['sentiment'], 
+                    test_size=0.2, stratify=df['sentiment'], random_state=42
+                )
+                X_train_text = X_train['text_clean'].astype(str)
+                X_test_text = X_test['text_clean'].astype(str)
+
+                # Ekstraksi fitur TF-IDF dari teks
+                vectorizer = TfidfVectorizer(max_features=5000, ngram_range=(1,2), stop_words=indonesian_stopwords)
+                X_train_tfidf = vectorizer.fit_transform(X_train_text)
+                X_test_tfidf = vectorizer.transform(X_test_text)
+
+                # Gabungkan TF-IDF dengan lexicon score
+                X_train_df = pd.DataFrame(X_train_tfidf.toarray(), columns=vectorizer.get_feature_names_out())
+                X_test_df = pd.DataFrame(X_test_tfidf.toarray(), columns=vectorizer.get_feature_names_out())
+
+                X_train_df['lexicon_score'] = X_train['lexicon_score'].values
+                X_test_df['lexicon_score'] = X_test['lexicon_score'].values
+                X_train_df.reset_index(drop=True, inplace=True)
+                X_test_df.reset_index(drop=True, inplace=True)
+
+                X_train_final = csr_matrix(X_train_df.values)
+                X_test_final = csr_matrix(X_test_df.values)
+
+                # Statistik data latih
+                jumlah_data_latih_positive = sum(Y_train == "positive")
+                jumlah_data_latih_negative = sum(Y_train == "negative")
+                jumlah_data_latih_neutral = sum(Y_train == "neutral")
+
+                st.write("Data Latih:")
+                st.write(f"Jumlah data latih dengan sentimen positive: {jumlah_data_latih_positive}")
+                st.write(f"Jumlah data latih dengan sentimen negative: {jumlah_data_latih_negative}")
+                st.write(f"Jumlah data latih dengan sentimen neutral: {jumlah_data_latih_neutral}")
+
+                st.write("====================================================================")
+
+                # Latih SVM
+                clfsvm = svm.SVC(kernel="linear", class_weight="balanced")
+                clfsvm.fit(X_train_final, Y_train)
+                predict = clfsvm.predict(X_test_final)
+
+                st.write(f"Jumlah data uji: {X_test.shape[0]}")
+                st.write("SVM Accuracy score  -> ", accuracy_score(Y_test, predict) * 100)
+                st.write("SVM Recall Score    -> ", recall_score(Y_test, predict, average='macro') * 100)
+                st.write("SVM Precision score -> ", precision_score(Y_test, predict, average='macro') * 100)
+                st.write("SVM f1 score        -> ", f1_score(Y_test, predict, average='macro') * 100)
+
+                st.write("===========================================================")
+
+                cm = confusion_matrix(Y_test, predict)
+
+                # Buat heatmap dari confusion matrix
+                fig, ax = plt.subplots(figsize=(8, 6))
+                sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False,
+                            xticklabels=["negative", "neutral", "positive"],
+                            yticklabels=["negative", "neutral", "positive"])
+                plt.xlabel("Predicted Labels")
+                plt.ylabel("True Labels")
+                plt.title("Confusion Matrix")
+                st.pyplot(fig)
+
+                st.write("===========================================================")
+                st.text('classification report : \n' + classification_report(Y_test, predict, zero_division=0))
+
+    except Exception as e:
+        st.write(f'Terjadi kesalahan: {e}')
 
 if __name__ == '__main__':
     main()
