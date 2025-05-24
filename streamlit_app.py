@@ -468,7 +468,7 @@ def main():
                 # Hitung Lexicon Score
                 lexicon = {}
                 with st.spinner("Loading Lexicon..."):
-                    with open('/content/drive/MyDrive/Skripsi TA/InSet_Lexicon.csv', 'r') as csvfile:
+                    with open('InSet_Lexicon.csv', 'r') as csvfile:
                         reader = csv.reader(csvfile, delimiter=',')
                         for row in reader:
                             lexicon[row[0]] = int(row[1])
