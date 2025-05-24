@@ -467,10 +467,10 @@ def main():
 
                 # Hitung Lexicon Score
                 lexicon = {}
-                with open('InSet_Lexicon.csv', 'r') as csvfile:
-                    reader = csv.reader(csvfile, delimiter=',')
-                    for row in reader:
-                        lexicon[row[0]] = int(row[1])
+                    with open('InSet_Lexicon.csv', 'r') as csvfile:
+                        reader = csv.reader(csvfile, delimiter=',')
+                        for row in reader:
+                            lexicon[row[0]] = int(row[1])
 
                 def lexicon_score(text):
                     return sum(lexicon.get(word, 0) for word in text.split())
