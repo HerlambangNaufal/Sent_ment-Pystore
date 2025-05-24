@@ -437,12 +437,10 @@ def main():
             st.write('Select The Correct File')
     with tab4:
         try:
-            st.write("Checkpoint 1: Starting tab4 execution")
             data_file = st.file_uploader("Upload labeled CSV file", type=["csv"])
             if data_file is not None:
                 df = pd.read_csv(data_file)
                 st.dataframe(df)
-                st.write("Checkpoint 2: Data loaded successfully")
     
                 proseseval = st.button('Start process', key='start_process_btn_tab4')
     
@@ -454,7 +452,6 @@ def main():
     
                 if proseseval or st.session_state.evalmodel:
                     st.session_state.evalmodel = True
-                    st.write("Checkpoint 3: Process button clicked")
     
                     st.write("\n Counting SVM Accuracy...")
     
@@ -467,7 +464,6 @@ def main():
                             return "neutral"
     
                     df['sentiment'] = df['sentiment'].apply(score_sentiment)
-                    st.write("Checkpoint 4: Sentiment scored")
     
                     # Hitung Lexicon Score
                     lexicon = {}
