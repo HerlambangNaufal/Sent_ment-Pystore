@@ -2,13 +2,13 @@
 import streamlit as st
 from google_play_scraper import Sort, reviews
 import pandas as pd
+import csv
 import numpy as np
 import re
 import string
 import nltk
 import seaborn as sns
 import os
-import csv
 nltk.download('punkt_tab')
 nltk.download('stopwords')
 from nltk.corpus import stopwords
