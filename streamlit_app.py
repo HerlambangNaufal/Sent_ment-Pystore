@@ -503,7 +503,7 @@ def main():
                     st.write("Checkpoint 7: Data split completed")
     
                     # Ekstraksi fitur TF-IDF dari teks
-                    vectorizer = TfidfVectorizer(max_features=5000, ngram_range=(1,2), stop_words=indonesian_stopwords)
+                    vectorizer = TfidfVectorizer(max_features=200, ngram_range=(1,2), stop_words=indonesian_stopwords)
                     X_train_tfidf = vectorizer.fit_transform(X_train_text)
                     X_test_tfidf = vectorizer.transform(X_test_text)
     
