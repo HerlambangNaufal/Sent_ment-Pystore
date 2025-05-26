@@ -354,8 +354,6 @@ def main():
                 except:
                     st.write('error')
                     
-                st.write("====================================================================")
-                st.subheader("Analisis Perbandingan Tahun dan Alasan Penurunan")
 
                 # Filter Data Berdasarkan Tahun
                 df['at'] = pd.to_datetime(df['at'])
