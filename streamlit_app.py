@@ -395,8 +395,6 @@ def main():
                     ax.set_ylabel("Rata-Rata Rating (1-5)")
                     ax.grid(True)
                     st.pyplot(fig)
-                else:
-                    st.write("Tidak cukup data tahun untuk menampilkan tren rata-rata rating (minimal 2 tahun diperlukan).")
                     
                 # Visualisasi Rata-Rata Rating per Tahun
                 avg_rating_per_year = df.groupby('year')['score'].mean()
@@ -409,8 +407,6 @@ def main():
                     ax.set_ylabel("Rata-Rata Rating (1-5)")
                     ax.grid(True)
                     st.pyplot(fig)
-                else:
-                    st.write("Tidak cukup data tahun untuk menampilkan tren rata-rata rating (minimal 2 tahun diperlukan).")
                 
                 # distribusi sentimen per tahun
                 sentiment_distribution = df.groupby('year')['sentiment'].value_counts().unstack().fillna(0) 
