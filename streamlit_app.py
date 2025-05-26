@@ -389,24 +389,30 @@ def main():
                 # Hitung rata-rata rating asli per tahun
                 avg_rating_per_year = df.groupby('year')['score_original'].mean()
                 
-                # Visualisasi
-                fig, ax = plt.subplots(figsize=(10, 5))
-                avg_rating_per_year.plot(kind='line', marker='o', ax=ax, color='blue')
-                ax.set_title("Tren Rata-Rata Rating Google Play Store per Tahun", fontsize=16)
-                ax.set_xlabel("Tahun")
-                ax.set_ylabel("Rata-Rata Rating (1-5)")
-                ax.grid(True)
-                st.pyplot(fig)
+                if len(avg_rating_per_year) > 1:
+                    fig, ax = plt.subplots(figsize=(10, 5))
+                    avg_rating_per_year.plot(kind='line', marker='o', ax=ax, color='blue')
+                    ax.set_title("Tren Rata-Rata Rating Google Play Store per Tahun", fontsize=16)
+                    ax.set_xlabel("Tahun")
+                    ax.set_ylabel("Rata-Rata Rating (1-5)")
+                    ax.grid(True)
+                    st.pyplot(fig)
+                else:
+                    st.write("Tidak cukup data tahun untuk menampilkan tren rata-rata rating (minimal 2 tahun diperlukan).")
+                    
                 # Visualisasi Rata-Rata Rating per Tahun
                 avg_rating_per_year = df.groupby('year')['score'].mean()
-                st.write("Rata-Rata Rating per Tahun")
-                fig, ax = plt.subplots(figsize=(10, 5))
-                avg_rating_per_year.plot(kind='line', marker='o', ax=ax)
-                ax.set_title("Rata-Rata Skor Sentimen per Tahun", fontsize=16)
-                ax.set_xlabel("Tahun")
-                ax.set_ylabel("Rata-Rata Rating (1-5)")
-                ax.grid(True)
-                st.pyplot(fig)
+                if len(avg_rating_per_year) > 1:
+                    st.write("Rata-Rata Rating per Tahun")
+                    fig, ax = plt.subplots(figsize=(10, 5))
+                    avg_rating_per_year.plot(kind='line', marker='o', ax=ax)
+                    ax.set_title("Rata-Rata Skor Sentimen per Tahun", fontsize=16)
+                    ax.set_xlabel("Tahun")
+                    ax.set_ylabel("Rata-Rata Rating (1-5)")
+                    ax.grid(True)
+                    st.pyplot(fig)
+                else:
+                    st.write("Tidak cukup data tahun untuk menampilkan tren rata-rata rating (minimal 2 tahun diperlukan).")
                 
                 # distribusi sentimen per tahun
                 sentiment_distribution = df.groupby('year')['sentiment'].value_counts().unstack().fillna(0) 
