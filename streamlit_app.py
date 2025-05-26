@@ -365,15 +365,7 @@ def main():
                 year_options = [2021,2022, 2023, 2024,2025]
                 for year in year_options:
                     yearly_data = df[df['year'] == year]
-                    st.write(f"Tahun {year}:")
-                    st.write(f"- Jumlah Ulasan: {len(yearly_data)}")
-                    st.write(f"- Rata-Rata Rating: {yearly_data['score'].mean():.2f}")
                     sentiment_counts = yearly_data['sentiment'].value_counts()
-                    st.write(f"- Positif: {sentiment_counts.get('positive', 0)}")
-                    st.write(f"- Negatif: {sentiment_counts.get('negative', 0)}")
-                    st.write(f"- Netral: {sentiment_counts.get('neutral', 0)}")
-                    st.write(" ")
-                st.write("====================================================================")
                 
                 # Total jumlah ulasan per tahun menggunakan rating original     
                 total_reviews_per_year = df.groupby('year')['score_original'].count()
