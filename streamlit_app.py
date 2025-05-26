@@ -365,7 +365,7 @@ def main():
                 year_options = [2021,2022, 2023, 2024,2025]
                 for year in year_options:
                     yearly_data = df[df['year'] == year]
-                    sentiment_counts = yearly_data['sentiment'].value_counts()
+                    _ = yearly_data['sentiment'].value_counts()
                 
                 # Total jumlah ulasan per tahun menggunakan rating original     
                 total_reviews_per_year = df.groupby('year')['score_original'].count()
