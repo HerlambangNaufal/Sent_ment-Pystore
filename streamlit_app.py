@@ -8,7 +8,7 @@ import string
 import nltk
 import seaborn as sns
 import os
-nltk.download('punkt_tab')
+nltk.download('punkt')
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
